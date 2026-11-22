@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="Tell MealMate SA about your household, food preferences, allergies and grocery budget to create a personalised meal plan."
+    >
+
+    <title>Household Questionnaire | MealMate SA</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/app.js" defer></script>
+    <script src="js/questionnaire.js" defer></script>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="index.html" class="brand">
+                <img
+                    src="images/logo.png"
+                    alt=""
+                    class="brand-logo"
+                >
+                <span>MealMate <strong>SA</strong></span>
+            </a>
+
+            <button
+                class="menu-toggle"
+                id="menuToggle"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="navLinks"
+            >
+                ☰
+            </button>
+
+            <ul class="nav-links" id="navLinks">
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="questionnaire.html" class="active">
+                        Get Started
+                    </a>
+                </li>
+
+                <li>
+                    <a href="dashboard.html">Dashboard</a>
+                </li>
+
+                <li>
+                    <a href="recipes.html">Recipes</a>
+                </li>
+
+                <li>
+                    <a href="shopping-list.html">Shopping List</a>
+                </li>
+            </ul>
+
+            <a href="dashboard.html" class="button button-primary nav-cta">
+                My Dashboard
+            </a>
+
+        </nav>
+    </header>
+
+    <main class="questionnaire-page">
+
+        <!-- Page Introduction -->
+        <section class="page-intro container">
+
+            <span class="eyebrow">LET'S GET TO KNOW YOUR HOUSEHOLD</span>
+
+            <h1>Let's plan meals that work for you.</h1>
+
+            <p>
+                Every household is different. Tell us a little about
+                yours so we can help you plan affordable, enjoyable
+                meals without unnecessary food waste.
+            </p>
+
+            <div class="form-note">
+                <span aria-hidden="true">💚</span>
+                Your answers help us personalise your weekly meal plan.
+            </div>
+
+        </section>
+
+        <!-- Questionnaire Form -->
+        <section class="questionnaire-section container">
+
+            <form id="householdQuestionnaire" novalidate>
+
+                <!-- Section 1: Shopping Information -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">01</span>
+                        Where do you shop?
+                    </legend>
+
+                    <p class="section-description">
+                        Tell us where your household usually buys groceries.
+                    </p>
+
+                    <div class="form-group">
+
+                        <label for="retailer">
+                            Preferred supermarket
+                        </label>
+
+                        <select id="retailer" name="retailer" required>
+
+                            <option value="">
+                                Select your supermarket
+                            </option>
+
+                            <option value="Shoprite">Shoprite</option>
+                            <option value="Checkers">Checkers</option>
+                            <option value="Pick n Pay">Pick n Pay</option>
+                            <option value="Woolworths">Woolworths</option>
+                            <option value="SPAR">SPAR</option>
+                            <option value="Boxer">Boxer</option>
+                            <option value="Makro">Makro</option>
+                            <option value="Other">Other</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group hidden" id="otherRetailerGroup">
+
+                        <label for="otherRetailer">
+                            Enter supermarket name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="otherRetailer"
+                            name="otherRetailer"
+                            placeholder="Enter supermarket name"
+                        >
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="shoppingLocation">
+                            Suburb, town or shopping area
+                        </label>
+
+                        <input
+                            type="text"
+                            id="shoppingLocation"
+                            name="shoppingLocation"
+                            placeholder="e.g. Soweto, Johannesburg"
+                            required
+                        >
+
+                        <small>
+                            This helps us understand your shopping location.
+                        </small>
+
+                    </div>
+
+                </fieldset>
+
+                <!-- Section 2: Household Information -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">02</span>
+                        Tell us about your household
+                    </legend>
+
+                    <p class="section-description">
+                        We use your household size to calculate suitable
+                        meal portions and ingredient quantities.
+                    </p>
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+
+                            <label for="adultCount">
+                                Number of adults
+                            </label>
+
+                            <input
+                                type="number"
+                                id="adultCount"
+                                name="adultCount"
+                                min="1"
+                                max="30"
+                                value="1"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="childCount">
+                                Number of children
+                            </label>
+
+                            <input
+                                type="number"
+                                id="childCount"
+                                name="childCount"
+                                min="0"
+                                max="30"
+                                value="0"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            What age groups are the children in?
+                        </label>
+
+                        <p class="field-hint">
+                            Select all that apply.
+                        </p>
+
+                        <div class="checkbox-grid">
+
+                            <label class="choice-option">
+                                <input
+                                    type="checkbox"
+                                    name="childAgeGroups"
+                                    value="0-2 years"
+                                >
+                                Under 3 years
+                            </label>
+
+                            <label class="choice-option">
+                                <input
+                                    type="checkbox"
+                                    name="childAgeGroups"
+                                    value="3-5 years"
+                                >
+                                3–5 years
+                            </label>
+
+                            <label class="choice-option">
+                                <input
+                                    type="checkbox"
+                                    name="childAgeGroups"
+                                    value="6-12 years"
+                                >
+                                6–12 years
+                            </label>
+
+                            <label class="choice-option">
+                                <input
+                                    type="checkbox"
+                                    name="childAgeGroups"
+                                    value="13-17 years"
+                                >
+                                13–17 years
+                            </label>
+
+                        </div>
+
+                        <small>
+                            Children's portions should be adjusted for
+                            their individual needs.
+                        </small>
+
+                    </div>
+
+                </fieldset>
+
+                <!-- Section 3: Weekly Schedule -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">03</span>
+                        Your weekly schedule
+                    </legend>
+
+                    <p class="section-description">
+                        Select the days and meals you need help planning.
+                    </p>
+
+                    <div class="form-group">
+
+                        <label>Which days do you eat at home?</label>
+
+                        <div class="checkbox-grid">
+
+                            <label class="choice-option">
+                                <input type="checkbox" name="days" value="Monday">
+                                Monday
+                            </label>
+
+                            <label class="choice-option">
+                                <input type="checkbox" name="days" value="Tuesday">
+                                Tuesday
+                            </label>
+
+                            <label class="choice-option">
+                                <input type="checkbox" name="days" value="Wednesday">
+                                Wednesday
+                            </label>
+
+                            <label class="choice-option">
+                                <input type="checkbox" name="days" value="Thursday">
+                                Thursday
+                            </label>
+
+                            <label class="choice-option">
+                                <input type="checkbox" name="days" value="Friday">
+                                Friday
+                            </label>
+
+                            <label class="choice-option">
+                                <input type="checkbox" name="days" value="Saturday">
+                                Saturday
+                            </label>
+
+                            <label class="choice-option">
+                                <input type="checkbox" name="days" value="Sunday">
+                                Sunday
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>Which meals do you want to plan?</label>
+
+                        <div class="checkbox-grid">
+
+                            <label class="choice-option">
+                                <input
+                                    type="checkbox"
+                                    name="mealTypes"
+                                    value="Breakfast"
+                                >
+                                🍳 Breakfast
+                            </label>
+
+                            <label class="choice-option">
+                                <input
+                                    type="checkbox"
+                                    name="mealTypes"
+                                    value="Lunch"
+                                >
+                                🥗 Lunch
+                            </label>
+
+                            <label class="choice-option">
+                                <input
+                                    type="checkbox"
+                                    name="mealTypes"
+                                    value="Dinner"
+                                >
+                                🍲 Dinner
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </fieldset>
+
+                <!-- Section 4: Kitchen Appliances -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">04</span>
+                        Your kitchen equipment
+                    </legend>
+
+                    <p class="section-description">
+                        Select the appliances you have available.
+                        We will consider your cooking equipment when
+                        suggesting recipes.
+                    </p>
+
+                    <div class="checkbox-grid">
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="appliances"
+                                value="Stove"
+                            >
+                            Stove
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="appliances"
+                                value="Oven"
+                            >
+                            Oven
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="appliances"
+                                value="Air fryer"
+                            >
+                            Air fryer
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="appliances"
+                                value="Microwave"
+                            >
+                            Microwave
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="appliances"
+                                value="Slow cooker"
+                            >
+                            Slow cooker
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="appliances"
+                                value="Pressure cooker"
+                            >
+                            Pressure cooker
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="appliances"
+                                value="Rice cooker"
+                            >
+                            Rice cooker
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="appliances"
+                                value="Blender"
+                            >
+                            Blender
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="appliances"
+                                value="Sandwich maker"
+                            >
+                            Sandwich maker
+                        </label>
+
+                    </div>
+
+                </fieldset>
+
+                <!-- Section 5: Dietary Preferences -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">05</span>
+                        Your dietary preferences
+                    </legend>
+
+                    <p class="section-description">
+                        Choose the dietary preference that best describes
+                        your household.
+                    </p>
+
+                    <div class="radio-grid">
+
+                        <label class="choice-option">
+                            <input
+                                type="radio"
+                                name="diet"
+                                value="No restrictions"
+                                checked
+                            >
+                            No specific restrictions
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="radio"
+                                name="diet"
+                                value="Halaal"
+                            >
+                            Halaal
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="radio"
+                                name="diet"
+                                value="Vegetarian"
+                            >
+                            Vegetarian
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="radio"
+                                name="diet"
+                                value="Vegan"
+                            >
+                            Vegan
+                        </label>
+
+                    </div>
+
+                    <small>
+                        Halaal selection excludes pork and non-Halaal
+                        meat. MealMate SA does not certify food as Halaal.
+                        Always verify ingredients and certification.
+                    </small>
+
+                </fieldset>
+
+                <!-- Section 6: Cooking Preferences -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">06</span>
+                        How do you like to cook?
+                    </legend>
+
+                    <p class="section-description">
+                        Choose the cooking styles that suit your lifestyle.
+                    </p>
+
+                    <div class="checkbox-grid">
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="cookingStyles"
+                                value="Budget-friendly"
+                            >
+                            💰 Budget-friendly meals
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="cookingStyles"
+                                value="Quick meals"
+                            >
+                            ⏱️ Quick meals
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="cookingStyles"
+                                value="Traditional South African"
+                            >
+                            🇿🇦 Traditional South African
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="cookingStyles"
+                                value="One-pot meals"
+                            >
+                            🍲 One-pot meals
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="cookingStyles"
+                                value="Batch cooking"
+                            >
+                            Batch cooking
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="cookingStyles"
+                                value="Healthy and balanced"
+                            >
+                            Healthy and balanced
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="cookingStyles"
+                                value="Family-friendly"
+                            >
+                            Family-friendly
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="cookingStyles"
+                                value="Leftover-friendly"
+                            >
+                            Leftover-friendly
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="cookingStyles"
+                                value="Minimal preparation"
+                            >
+                            Minimal preparation
+                        </label>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="maxCookingTime">
+                            Maximum cooking time
+                        </label>
+
+                        <select id="maxCookingTime" name="maxCookingTime">
+
+                            <option value="Any">
+                                No time limit
+                            </option>
+
+                            <option value="15">
+                                15 minutes
+                            </option>
+
+                            <option value="30">
+                                30 minutes
+                            </option>
+
+                            <option value="45">
+                                45 minutes
+                            </option>
+
+                            <option value="60">
+                                60 minutes
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </fieldset>
+
+                <!-- Section 7: Calorie Preferences -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">07</span>
+                        Nutrition preferences
+                    </legend>
+
+                    <p class="section-description">
+                        Nutrition information is optional. You can choose
+                        whether you would like to set an adult calorie
+                        target.
+                    </p>
+
+                    <div class="form-group">
+
+                        <label for="calorieGoalType">
+                            Calorie target preference
+                        </label>
+
+                        <select
+                            id="calorieGoalType"
+                            name="calorieGoalType"
+                        >
+
+                            <option value="none">
+                                No calorie target
+                            </option>
+
+                            <option value="per-adult">
+                                Target per adult per day
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group hidden" id="calorieTargetGroup">
+
+                        <label for="calorieTarget">
+                            Daily calorie target per adult (kcal)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="calorieTarget"
+                            name="calorieTarget"
+                            min="500"
+                            max="6000"
+                            placeholder="e.g. 2000"
+                        >
+
+                        <small>
+                            This is an optional planning estimate, not
+                            medical or nutritional advice. Adult targets
+                            will not automatically be applied to children.
+                        </small>
+
+                    </div>
+
+                </fieldset>
+
+                <!-- Section 8: Allergies -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">08</span>
+                        Food allergies
+                    </legend>
+
+                    <p class="section-description">
+                        Select any ingredients that members of your
+                        household are allergic to. We treat allergies
+                        as strict exclusions.
+                    </p>
+
+                    <div class="checkbox-grid">
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="allergies"
+                                value="Peanuts"
+                            >
+                            Peanuts
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="allergies"
+                                value="Tree nuts"
+                            >
+                            Tree nuts
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="allergies"
+                                value="Dairy"
+                            >
+                            Dairy
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="allergies"
+                                value="Eggs"
+                            >
+                            Eggs
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="allergies"
+                                value="Gluten/Wheat"
+                            >
+                            Gluten / Wheat
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="allergies"
+                                value="Soy"
+                            >
+                            Soy
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="allergies"
+                                value="Fish"
+                            >
+                            Fish
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="allergies"
+                                value="Shellfish"
+                            >
+                            Shellfish
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="allergies"
+                                value="Sesame"
+                            >
+                            Sesame
+                        </label>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="otherAllergies">
+                            Other allergies
+                        </label>
+
+                        <textarea
+                            id="otherAllergies"
+                            name="otherAllergies"
+                            rows="3"
+                            placeholder="List any other allergies here..."
+                        ></textarea>
+
+                    </div>
+
+                    <div class="form-note warning-note">
+                        <span aria-hidden="true">⚠️</span>
+
+                        Always check product packaging and cross-contact
+                        warnings. Meal suggestions cannot guarantee that
+                        food is allergen-free or safe for consumption.
+                    </div>
+
+                </fieldset>
+
+                <!-- Section 9: Disliked Ingredients -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">09</span>
+                        Ingredients you dislike
+                    </legend>
+
+                    <p class="section-description">
+                        Let us know which ingredients your household
+                        would rather avoid. These are preferences,
+                        not allergies.
+                    </p>
+
+                    <div class="checkbox-grid">
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="dislikedIngredients"
+                                value="Onions"
+                            >
+                            Onions
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="dislikedIngredients"
+                                value="Tomatoes"
+                            >
+                            Tomatoes
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="dislikedIngredients"
+                                value="Mushrooms"
+                            >
+                            Mushrooms
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="dislikedIngredients"
+                                value="Spinach"
+                            >
+                            Spinach
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="dislikedIngredients"
+                                value="Broccoli"
+                            >
+                            Broccoli
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="dislikedIngredients"
+                                value="Cabbage"
+                            >
+                            Cabbage
+                        </label>
+
+                        <label class="choice-option">
+                            <input
+                                type="checkbox"
+                                name="dislikedIngredients"
+                                value="Beetroot"
+                            >
+                            Beetroot
+                        </label>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="otherDislikes">
+                            Other ingredients you dislike
+                        </label>
+
+                        <textarea
+                            id="otherDislikes"
+                            name="otherDislikes"
+                            rows="3"
+                            placeholder="List other ingredients..."
+                        ></textarea>
+
+                    </div>
+
+                </fieldset>
+
+                <!-- Section 10: Pantry Inventory -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">10</span>
+                        What's already in your pantry?
+                    </legend>
+
+                    <p class="section-description">
+                        Tell us which ingredients you currently have.
+                        This helps us avoid adding unnecessary items
+                        to your shopping list.
+                    </p>
+
+                    <div class="form-group">
+
+                        <label for="pantryItems">
+                            Existing ingredients and quantities
+                        </label>
+
+                        <textarea
+                            id="pantryItems"
+                            name="pantryItems"
+                            rows="6"
+                            placeholder="Example:
+Rice - 2 kg
+Cooking oil - 1 litre
+Potatoes - 2 kg
+Onions - 6
+Eggs - 12
+Sugar - 1 kg"
+                        ></textarea>
+
+                        <small>
+                            Include quantities where possible.
+                            You can enter one ingredient per line.
+                        </small>
+
+                    </div>
+
+                </fieldset>
+
+                <!-- Section 11: Weekly Budget -->
+                <fieldset class="form-section">
+
+                    <legend>
+                        <span class="section-number">11</span>
+                        Your weekly grocery budget
+                    </legend>
+
+                    <p class="section-description">
+                        Set a budget that is realistic for your household.
+                        All budget amounts are in South African Rand (ZAR).
+                    </p>
+
+                    <div class="form-group">
+
+                        <label for="weeklyBudget">
+                            How much would you like to spend per week?
+                        </label>
+
+                        <div class="currency-input">
+
+                            <span aria-hidden="true">R</span>
+
+                            <input
+                                type="number"
+                                id="weeklyBudget"
+                                name="weeklyBudget"
+                                min="1"
+                                max="100000"
+                                step="1"
+                                placeholder="e.g. 1000"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="budgetScope">
+                            What should this budget cover?
+                        </label>
+
+                        <select
+                            id="budgetScope"
+                            name="budgetScope"
+                            required
+                        >
+
+                            <option value="all-meals">
+                                All selected meals
+                            </option>
+
+                            <option value="selected-meals">
+                                Only selected meal categories
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-note">
+                        <span aria-hidden="true">💡</span>
+
+                        Grocery prices may vary between retailers and
+                        locations. Any estimated prices will be clearly
+                        labelled as estimates.
+                    </div>
+
+                </fieldset>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+
+                    <button
+                        type="reset"
+                        class="button button-outline"
+                    >
+                        Clear Form
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="button button-primary"
+                    >
+                        Save My Preferences →
+                    </button>
+
+                </div>
+
+                <!-- Form Feedback -->
+                <div
+                    id="questionnaireMessage"
+                    class="form-message"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+
+        <div class="container footer-content">
+
+            <div class="footer-brand">
+
+                <a href="index.html" class="brand footer-logo">
+                    <span>MealMate <strong>SA</strong></span>
+                </a>
+
+                <p>
+                    Helping South African households plan smarter,
+                    eat better and spend wisely.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+
+                <h3>Explore</h3>
+
+                <a href="index.html">Home</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="recipes.html">Recipes</a>
+                <a href="shopping-list.html">Shopping List</a>
+
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+
+            <div class="container">
+
+                <p>
+                    &copy; <span id="currentYear"></span>
+                    MealMate SA. All rights reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>
