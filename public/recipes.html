@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="Discover affordable recipes for your household with MealMate SA. Search meals, explore ingredients and find cooking inspiration."
+    >
+
+    <title>Explore Recipes | MealMate SA</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/app.js" defer></script>
+    <script src="js/recipes.js" defer></script>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="index.html" class="brand">
+                <img
+                    src="images/logo.png"
+                    alt=""
+                    class="brand-logo"
+                >
+                <span>MealMate <strong>SA</strong></span>
+            </a>
+
+            <button
+                class="menu-toggle"
+                id="menuToggle"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="navLinks"
+            >
+                ☰
+            </button>
+
+            <ul class="nav-links" id="navLinks">
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="questionnaire.html">Get Started</a>
+                </li>
+
+                <li>
+                    <a href="dashboard.html">Dashboard</a>
+                </li>
+
+                <li>
+                    <a href="recipes.html" class="active">
+                        Recipes
+                    </a>
+                </li>
+
+                <li>
+                    <a href="shopping-list.html">Shopping List</a>
+                </li>
+
+            </ul>
+
+            <a
+                href="dashboard.html"
+                class="button button-primary nav-cta"
+            >
+                My Dashboard
+            </a>
+
+        </nav>
+    </header>
+
+    <main class="recipes-page">
+
+        <!-- Page Introduction -->
+        <section class="page-intro container">
+
+            <span class="eyebrow">FRESH IDEAS FOR YOUR KITCHEN</span>
+
+            <h1>Discover your next favourite meal.</h1>
+
+            <p>
+                Explore meal ideas that fit your household, cooking style
+                and grocery budget. From traditional South African meals
+                to quick everyday favourites, find something delicious
+                to prepare.
+            </p>
+
+        </section>
+
+        <!-- Recipe Search -->
+        <section class="recipe-search-section container">
+
+            <form id="recipeSearchForm" class="recipe-search-form">
+
+                <div class="search-input-wrapper">
+
+                    <label for="recipeSearch" class="visually-hidden">
+                        Search recipes or ingredients
+                    </label>
+
+                    <span class="search-icon" aria-hidden="true">
+                        🔎
+                    </span>
+
+                    <input
+                        type="search"
+                        id="recipeSearch"
+                        name="search"
+                        placeholder="Search recipes or ingredients..."
+                    >
+
+                    <button
+                        type="submit"
+                        class="button button-primary"
+                    >
+                        Search
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- Filters -->
+        <section class="recipe-filter-section container">
+
+            <div class="filter-heading">
+
+                <div>
+                    <span class="eyebrow">FIND WHAT YOU'RE CRAVING</span>
+
+                    <h2>Explore recipes</h2>
+                </div>
+
+                <button
+                    type="button"
+                    class="text-link"
+                    id="clearRecipeFilters"
+                >
+                    Clear filters
+                </button>
+
+            </div>
+
+            <div class="recipe-filters">
+
+                <div class="form-group">
+
+                    <label for="mealCategory">
+                        Meal category
+                    </label>
+
+                    <select id="mealCategory" name="mealCategory">
+
+                        <option value="all">All meals</option>
+                        <option value="Breakfast">Breakfast</option>
+                        <option value="Lunch">Lunch</option>
+                        <option value="Dinner">Dinner</option>
+                        <option value="Snacks">Snacks</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="dietFilter">
+                        Dietary preference
+                    </label>
+
+                    <select id="dietFilter" name="dietFilter">
+
+                        <option value="all">All preferences</option>
+                        <option value="Vegan">Vegan</option>
+                        <option value="Vegetarian">Vegetarian</option>
+                        <option value="Halaal">Halaal-friendly</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="cookingTimeFilter">
+                        Maximum cooking time
+                    </label>
+
+                    <select
+                        id="cookingTimeFilter"
+                        name="cookingTimeFilter"
+                    >
+
+                        <option value="all">Any time</option>
+                        <option value="15">15 minutes</option>
+                        <option value="30">30 minutes</option>
+                        <option value="45">45 minutes</option>
+                        <option value="60">60 minutes</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="sortRecipes">
+                        Sort recipes
+                    </label>
+
+                    <select id="sortRecipes" name="sortRecipes">
+
+                        <option value="default">Recommended</option>
+                        <option value="name-asc">Name: A to Z</option>
+                        <option value="time-asc">Quickest first</option>
+                        <option value="cost-asc">Lowest estimated cost</option>
+                        <option value="cost-desc">Highest estimated cost</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Household Preferences Notice -->
+        <section class="recipe-personalisation container">
+
+            <div class="personalisation-icon" aria-hidden="true">
+                💚
+            </div>
+
+            <div>
+
+                <h3>Make recipes work for your household.</h3>
+
+                <p>
+                    Your household preferences, allergies and dietary
+                    requirements should guide recipe selection.
+                    Update your preferences before preparing a meal.
+                </p>
+
+                <a href="questionnaire.html" class="text-link">
+                    Update my preferences →
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- Recipe Results -->
+        <section class="recipe-results-section container">
+
+            <div class="recipe-results-heading">
+
+                <div>
+
+                    <span class="eyebrow">MADE FOR EVERYDAY COOKING</span>
+
+                    <h2>Available recipes</h2>
+
+                    <p id="recipeResultCount" aria-live="polite">
+                        Discover meals for your household.
+                    </p>
+
+                </div>
+
+                <a
+                    href="dashboard.html"
+                    class="button button-outline"
+                >
+                    Back to Dashboard
+                </a>
+
+            </div>
+
+            <!-- Loading Message -->
+            <div
+                class="loading-state hidden"
+                id="recipeLoading"
+                role="status"
+                aria-live="polite"
+            >
+                <span class="loading-spinner" aria-hidden="true"></span>
+
+                <p>Finding delicious recipes for you...</p>
+
+            </div>
+
+            <!-- Error Message -->
+            <div
+                class="form-message error-message hidden"
+                id="recipeError"
+                role="alert"
+            ></div>
+
+            <!-- Empty Results -->
+            <div
+                class="empty-state hidden"
+                id="recipeEmptyState"
+            >
+
+                <div class="empty-state-icon">🥘</div>
+
+                <h3>No recipes found.</h3>
+
+                <p>
+                    Try changing your search or filters to discover
+                    more meals.
+                </p>
+
+                <button
+                    type="button"
+                    class="button button-primary"
+                    id="emptyStateClearFilters"
+                >
+                    Clear Filters
+                </button>
+
+            </div>
+
+            <!-- Recipes will be inserted here using JavaScript -->
+            <div
+                class="recipe-grid"
+                id="recipeGrid"
+                aria-live="polite"
+            ></div>
+
+        </section>
+
+        <!-- Recipe Card Template -->
+        <template id="recipeCardTemplate">
+
+            <article class="recipe-card">
+
+                <div class="recipe-image-wrapper">
+
+                    <img
+                        class="recipe-image"
+                        src="images/recipe-placeholder.jpg"
+                        alt=""
+                        loading="lazy"
+                    >
+
+                    <span class="recipe-category"></span>
+
+                    <button
+                        type="button"
+                        class="favourite-button"
+                        aria-label="Add recipe to favourites"
+                        aria-pressed="false"
+                        title="Add to favourites"
+                    >
+                        ♡
+                    </button>
+
+                </div>
+
+                <div class="recipe-card-content">
+
+                    <div class="recipe-card-meta">
+
+                        <span class="recipe-time"></span>
+
+                        <span class="recipe-cost"></span>
+
+                    </div>
+
+                    <h3 class="recipe-title"></h3>
+
+                    <p class="recipe-description"></p>
+
+                    <div class="recipe-tags"></div>
+
+                    <button
+                        type="button"
+                        class="button button-primary recipe-details-button"
+                    >
+                        View Recipe
+                    </button>
+
+                </div>
+
+            </article>
+
+        </template>
+
+        <!-- Recipe Details Dialog -->
+        <dialog
+            id="recipeDialog"
+            class="recipe-dialog"
+            aria-labelledby="dialogRecipeTitle"
+        >
+
+            <div class="recipe-dialog-content">
+
+                <div class="dialog-header">
+
+                    <div>
+                        <span class="eyebrow">LET'S GET COOKING</span>
+
+                        <h2 id="dialogRecipeTitle">
+                            Recipe Details
+                        </h2>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="dialog-close"
+                        id="closeRecipeDialog"
+                        aria-label="Close recipe details"
+                    >
+                        &times;
+                    </button>
+
+                </div>
+
+                <div id="recipeDetailsContent">
+
+                    <img
+                        id="dialogRecipeImage"
+                        src="images/recipe-placeholder.jpg"
+                        alt=""
+                        class="dialog-recipe-image"
+                    >
+
+                    <p id="dialogRecipeDescription"></p>
+
+                    <div class="recipe-detail-summary">
+
+                        <div>
+                            <span>Preparation time</span>
+                            <strong id="dialogPrepTime">--</strong>
+                        </div>
+
+                        <div>
+                            <span>Cooking time</span>
+                            <strong id="dialogCookTime">--</strong>
+                        </div>
+
+                        <div>
+                            <span>Estimated cost</span>
+                            <strong id="dialogRecipeCost">--</strong>
+                        </div>
+
+                        <div>
+                            <span>Servings</span>
+                            <strong id="dialogRecipeServings">--</strong>
+                        </div>
+
+                    </div>
+
+                    <section class="recipe-detail-section">
+
+                        <h3>Ingredients</h3>
+
+                        <ul id="dialogIngredients"></ul>
+
+                    </section>
+
+                    <section class="recipe-detail-section">
+
+                        <h3>Cooking instructions</h3>
+
+                        <ol id="dialogInstructions"></ol>
+
+                    </section>
+
+                    <div
+                        class="form-note warning-note"
+                        id="dialogAllergyNotice"
+                    >
+                        <span aria-hidden="true">⚠️</span>
+
+                        Always review the full ingredient list,
+                        product labels and cross-contact warnings
+                        before preparing food.
+                    </div>
+
+                    <div class="recipe-dialog-actions">
+
+                        <button
+                            type="button"
+                            class="button button-outline"
+                            id="dialogFavouriteButton"
+                        >
+                            ♡ Add to Favourites
+                        </button>
+
+                        <button
+                            type="button"
+                            class="button button-primary"
+                            id="addRecipeToPlanButton"
+                        >
+                            Add to Meal Plan
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </dialog>
+
+        <!-- Favourites Section -->
+        <section class="favourites-section container">
+
+            <div class="section-heading">
+
+                <span class="eyebrow">YOUR PERSONAL COLLECTION</span>
+
+                <h2>Favourite recipes</h2>
+
+                <p>
+                    Keep the meals your household loves close at hand.
+                </p>
+
+            </div>
+
+            <div
+                class="recipe-grid"
+                id="favouriteRecipeGrid"
+                aria-live="polite"
+            ></div>
+
+            <p
+                class="empty-favourites"
+                id="emptyFavourites"
+            >
+                You have not saved any favourite recipes yet.
+                Select the heart icon on a recipe to save it here.
+            </p>
+
+        </section>
+
+        <!-- Recipe Information -->
+        <section class="recipe-information-section container">
+
+            <div class="form-note warning-note">
+
+                <span aria-hidden="true">⚠️</span>
+
+                <div>
+
+                    <strong>Important food and allergy information</strong>
+
+                    <p>
+                        Recipe suggestions do not guarantee that a meal
+                        is allergen-free, Halaal-certified or suitable
+                        for every dietary need. Always inspect ingredient
+                        information and packaging, particularly for
+                        hidden allergens and cross-contact warnings.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <p class="api-attribution" id="recipeApiAttribution">
+                Recipe information and images will be attributed to
+                their respective data providers when displayed.
+            </p>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+
+        <div class="container footer-content">
+
+            <div class="footer-brand">
+
+                <a href="index.html" class="brand footer-logo">
+                    <span>MealMate <strong>SA</strong></span>
+                </a>
+
+                <p>
+                    Helping South African households plan smarter,
+                    eat better and spend wisely.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+
+                <h3>Explore</h3>
+
+                <a href="index.html">Home</a>
+                <a href="questionnaire.html">Get Started</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="shopping-list.html">Shopping List</a>
+
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+
+            <div class="container">
+
+                <p>
+                    &copy; <span id="currentYear"></span>
+                    MealMate SA. All rights reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>

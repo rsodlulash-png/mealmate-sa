@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="Manage your MealMate SA weekly meal plan, household preferences and grocery budget."
+    >
+
+    <title>My Dashboard | MealMate SA</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/app.js" defer></script>
+    <script src="js/dashboard.js" defer></script>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="index.html" class="brand">
+                <img
+                    src="images/logo.png"
+                    alt=""
+                    class="brand-logo"
+                >
+                <span>MealMate <strong>SA</strong></span>
+            </a>
+
+            <button
+                class="menu-toggle"
+                id="menuToggle"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="navLinks"
+            >
+                ☰
+            </button>
+
+            <ul class="nav-links" id="navLinks">
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="questionnaire.html">Get Started</a>
+                </li>
+
+                <li>
+                    <a href="dashboard.html" class="active">
+                        Dashboard
+                    </a>
+                </li>
+
+                <li>
+                    <a href="recipes.html">Recipes</a>
+                </li>
+
+                <li>
+                    <a href="shopping-list.html">Shopping List</a>
+                </li>
+
+            </ul>
+
+            <a
+                href="questionnaire.html"
+                class="button button-primary nav-cta"
+            >
+                Edit Preferences
+            </a>
+
+        </nav>
+    </header>
+
+    <main class="dashboard-page">
+
+        <!-- Dashboard Welcome -->
+        <section class="dashboard-welcome container">
+
+            <div class="welcome-text">
+
+                <span class="eyebrow">YOUR MEALMATE DASHBOARD</span>
+
+                <h1>
+                    Welcome back!
+                </h1>
+
+                <p>
+                    Your household meal-planning space.
+                    Let's make this week delicious, organised
+                    and budget-friendly.
+                </p>
+
+            </div>
+
+            <div class="welcome-actions">
+
+                <a
+                    href="questionnaire.html"
+                    class="button button-outline"
+                >
+                    Edit Household Details
+                </a>
+
+                <a
+                    href="recipes.html"
+                    class="button button-primary"
+                >
+                    Explore Recipes
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- Household Summary -->
+        <section class="dashboard-overview container">
+
+            <div class="section-heading dashboard-heading">
+
+                <div>
+                    <span class="eyebrow">YOUR HOUSEHOLD</span>
+
+                    <h2>Household overview</h2>
+                </div>
+
+                <a
+                    href="questionnaire.html"
+                    class="text-link"
+                >
+                    Update details →
+                </a>
+
+            </div>
+
+            <div class="overview-grid">
+
+                <article class="overview-card">
+
+                    <div class="overview-icon">👨‍👩‍👧‍👦</div>
+
+                    <div>
+                        <p class="card-label">Household members</p>
+
+                        <h3 id="householdSize">Not set</h3>
+
+                        <p id="householdBreakdown">
+                            Complete your questionnaire
+                        </p>
+                    </div>
+
+                </article>
+
+                <article class="overview-card">
+
+                    <div class="overview-icon">🥗</div>
+
+                    <div>
+                        <p class="card-label">Dietary preference</p>
+
+                        <h3 id="dietaryPreference">Not set</h3>
+
+                        <p>Your household's food preference</p>
+                    </div>
+
+                </article>
+
+                <article class="overview-card">
+
+                    <div class="overview-icon">🏪</div>
+
+                    <div>
+                        <p class="card-label">Preferred retailer</p>
+
+                        <h3 id="preferredRetailer">Not set</h3>
+
+                        <p id="shoppingLocation">Shopping location not set</p>
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- Budget Overview -->
+        <section class="budget-section container">
+
+            <div class="section-heading dashboard-heading">
+
+                <div>
+                    <span class="eyebrow">YOUR GROCERY SPENDING</span>
+
+                    <h2>Weekly budget</h2>
+                </div>
+
+                <span class="budget-period">
+                    Weekly overview
+                </span>
+
+            </div>
+
+            <div class="budget-grid">
+
+                <article class="budget-card">
+
+                    <p class="card-label">Your weekly budget</p>
+
+                    <h3 id="weeklyBudgetValue">R0.00</h3>
+
+                    <p>Your planned grocery allowance</p>
+
+                </article>
+
+                <article class="budget-card">
+
+                    <p class="card-label">Estimated spending</p>
+
+                    <h3 id="estimatedSpend">R0.00</h3>
+
+                    <p>Based on your current meal plan</p>
+
+                </article>
+
+                <article class="budget-card">
+
+                    <p class="card-label">Budget remaining</p>
+
+                    <h3 id="budgetRemaining">R0.00</h3>
+
+                    <p>Amount remaining in your budget</p>
+
+                </article>
+
+            </div>
+
+            <!-- Budget Progress -->
+            <div class="budget-progress-card">
+
+                <div class="progress-heading">
+
+                    <div>
+                        <h3>Budget usage</h3>
+
+                        <p id="budgetProgressText">
+                            Complete your questionnaire to get started.
+                        </p>
+                    </div>
+
+                    <strong id="budgetPercentage">0%</strong>
+
+                </div>
+
+                <div
+                    class="progress-track"
+                    id="budgetProgressTrack"
+                    role="progressbar"
+                    aria-label="Weekly grocery budget used"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                >
+
+                    <div
+                        class="progress-fill"
+                        id="budgetProgressFill"
+                    ></div>
+
+                </div>
+
+                <p class="budget-disclaimer">
+                    Grocery amounts are estimates unless confirmed
+                    by a live retailer price source.
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- Weekly Meal Plan -->
+        <section class="weekly-plan-section container">
+
+            <div class="section-heading dashboard-heading">
+
+                <div>
+                    <span class="eyebrow">YOUR WEEK AT A GLANCE</span>
+
+                    <h2>Weekly meal plan</h2>
+
+                    <p>
+                        See what your household will be enjoying
+                        throughout the week.
+                    </p>
+                </div>
+
+                <a
+                    href="recipes.html"
+                    class="button button-primary"
+                >
+                    Browse Recipes
+                </a>
+
+            </div>
+
+            <div class="meal-plan-toolbar">
+
+                <div>
+                    <span class="toolbar-label">Planning period</span>
+
+                    <h3 id="currentWeekLabel">
+                        Your weekly meal plan
+                    </h3>
+                </div>
+
+                <div class="plan-actions">
+
+                    <button
+                        type="button"
+                        class="button button-outline"
+                        id="generateMealPlanButton"
+                    >
+                        Generate Meal Plan
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Empty state shown before a plan is generated -->
+            <div
+                class="empty-state"
+                id="dashboardEmptyState"
+            >
+
+                <div class="empty-state-icon">🍽️</div>
+
+                <h3>Your meal plan is waiting!</h3>
+
+                <p>
+                    Complete your household questionnaire and generate
+                    your first personalised weekly meal plan.
+                </p>
+
+                <a
+                    href="questionnaire.html"
+                    class="button button-primary"
+                >
+                    Complete Questionnaire
+                </a>
+
+            </div>
+
+            <!-- JavaScript will display the generated weekly plan here -->
+            <div
+                class="meal-plan-grid"
+                id="mealPlanContainer"
+                aria-live="polite"
+            ></div>
+
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions-section container">
+
+            <div class="section-heading">
+
+                <span class="eyebrow">MAKE THE MOST OF MEALMATE</span>
+
+                <h2>Quick actions</h2>
+
+                <p>
+                    Everything you need to organise your kitchen
+                    in one place.
+                </p>
+
+            </div>
+
+            <div class="quick-actions-grid">
+
+                <a
+                    href="recipes.html"
+                    class="quick-action-card"
+                >
+
+                    <span class="quick-action-icon">📖</span>
+
+                    <h3>Explore Recipes</h3>
+
+                    <p>
+                        Discover meals and find new cooking inspiration.
+                    </p>
+
+                    <span class="text-link">View Recipes →</span>
+
+                </a>
+
+                <a
+                    href="shopping-list.html"
+                    class="quick-action-card"
+                >
+
+                    <span class="quick-action-icon">🛒</span>
+
+                    <h3>Shopping List</h3>
+
+                    <p>
+                        Organise your ingredients and track shopping
+                        items as you buy them.
+                    </p>
+
+                    <span class="text-link">Open Shopping List →</span>
+
+                </a>
+
+                <a
+                    href="questionnaire.html"
+                    class="quick-action-card"
+                >
+
+                    <span class="quick-action-icon">⚙️</span>
+
+                    <h3>Household Preferences</h3>
+
+                    <p>
+                        Update your household details, budget and
+                        dietary requirements.
+                    </p>
+
+                    <span class="text-link">Update Preferences →</span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="activity-section container">
+
+            <div class="section-heading">
+
+                <span class="eyebrow">YOUR MEAL PLANNING JOURNEY</span>
+
+                <h2>Recent activity</h2>
+
+            </div>
+
+            <div
+                class="activity-list"
+                id="recentActivity"
+                aria-live="polite"
+            >
+
+                <div class="activity-empty">
+
+                    <span aria-hidden="true">📝</span>
+
+                    <p>
+                        Your recent meal-planning activities will
+                        appear here.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Helpful Reminder -->
+        <section class="dashboard-tip container">
+
+            <div class="tip-icon">💡</div>
+
+            <div>
+
+                <h3>A little planning goes a long way.</h3>
+
+                <p>
+                    Check your pantry before shopping. Using ingredients
+                    you already have can help reduce unnecessary spending
+                    and food waste.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+
+        <div class="container footer-content">
+
+            <div class="footer-brand">
+
+                <a href="index.html" class="brand footer-logo">
+                    <span>MealMate <strong>SA</strong></span>
+                </a>
+
+                <p>
+                    Helping South African households plan smarter,
+                    eat better and spend wisely.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+
+                <h3>Explore</h3>
+
+                <a href="index.html">Home</a>
+                <a href="questionnaire.html">Get Started</a>
+                <a href="recipes.html">Recipes</a>
+                <a href="shopping-list.html">Shopping List</a>
+
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+
+            <div class="container">
+
+                <p>
+                    &copy; <span id="currentYear"></span>
+                    MealMate SA. All rights reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>
