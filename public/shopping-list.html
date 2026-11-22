@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="Manage your MealMate SA grocery list, track purchased ingredients and monitor your weekly shopping budget."
+    >
+
+    <title>My Shopping List | MealMate SA</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="js/app.js" defer></script>
+    <script src="js/shopping-list.js" defer></script>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="site-header">
+
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="index.html" class="brand">
+                <img
+                    src="images/logo.png"
+                    alt=""
+                    class="brand-logo"
+                >
+                <span>MealMate <strong>SA</strong></span>
+            </a>
+
+            <button
+                class="menu-toggle"
+                id="menuToggle"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="navLinks"
+            >
+                ☰
+            </button>
+
+            <ul class="nav-links" id="navLinks">
+
+                <li>
+                    <a href="index.html">Home</a>
+                </li>
+
+                <li>
+                    <a href="questionnaire.html">Get Started</a>
+                </li>
+
+                <li>
+                    <a href="dashboard.html">Dashboard</a>
+                </li>
+
+                <li>
+                    <a href="recipes.html">Recipes</a>
+                </li>
+
+                <li>
+                    <a href="shopping-list.html" class="active">
+                        Shopping List
+                    </a>
+                </li>
+
+            </ul>
+
+            <a
+                href="dashboard.html"
+                class="button button-primary nav-cta"
+            >
+                My Dashboard
+            </a>
+
+        </nav>
+
+    </header>
+
+    <main class="shopping-page">
+
+        <!-- Page Introduction -->
+        <section class="page-intro container">
+
+            <span class="eyebrow">SMARTER SHOPPING STARTS HERE</span>
+
+            <h1>Your weekly shopping list.</h1>
+
+            <p>
+                Keep your grocery shopping organised.
+                See what you need, check what you already have
+                and track your estimated spending as you shop.
+            </p>
+
+        </section>
+
+        <!-- Shopping Summary -->
+        <section class="shopping-summary-section container">
+
+            <div class="section-heading">
+
+                <span class="eyebrow">YOUR SHOPPING OVERVIEW</span>
+
+                <h2>Let's get organised.</h2>
+
+            </div>
+
+            <div class="shopping-summary-grid">
+
+                <article class="shopping-summary-card">
+
+                    <div class="summary-icon">🛒</div>
+
+                    <div>
+                        <p class="card-label">Total items</p>
+
+                        <h3 id="totalItems">0</h3>
+
+                        <p>Items on your shopping list</p>
+                    </div>
+
+                </article>
+
+                <article class="shopping-summary-card">
+
+                    <div class="summary-icon">✅</div>
+
+                    <div>
+                        <p class="card-label">Items purchased</p>
+
+                        <h3 id="purchasedItems">0</h3>
+
+                        <p>Items you have checked off</p>
+                    </div>
+
+                </article>
+
+                <article class="shopping-summary-card">
+
+                    <div class="summary-icon">💰</div>
+
+                    <div>
+                        <p class="card-label">Estimated total</p>
+
+                        <h3 id="shoppingEstimatedTotal">R0.00</h3>
+
+                        <p>Estimated shopping cost</p>
+                    </div>
+
+                </article>
+
+                <article class="shopping-summary-card">
+
+                    <div class="summary-icon">🏦</div>
+
+                    <div>
+                        <p class="card-label">Budget remaining</p>
+
+                        <h3 id="shoppingBudgetRemaining">R0.00</h3>
+
+                        <p>Based on your weekly grocery budget</p>
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- Shopping Progress -->
+        <section class="shopping-progress-section container">
+
+            <div class="shopping-progress-card">
+
+                <div class="progress-heading">
+
+                    <div>
+
+                        <h2>Your shopping progress</h2>
+
+                        <p id="shoppingProgressText">
+                            You haven't checked off any items yet.
+                        </p>
+
+                    </div>
+
+                    <strong id="shoppingProgressPercentage">
+                        0%
+                    </strong>
+
+                </div>
+
+                <div
+                    class="progress-track"
+                    id="shoppingProgressTrack"
+                    role="progressbar"
+                    aria-label="Shopping items purchased"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    aria-valuenow="0"
+                >
+
+                    <div
+                        class="progress-fill"
+                        id="shoppingProgressFill"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Retailer Information -->
+        <section class="retailer-section container">
+
+            <div class="retailer-card">
+
+                <div>
+
+                    <span class="eyebrow">YOUR PREFERRED SUPERMARKET</span>
+
+                    <h2 id="shoppingRetailer">
+                        No supermarket selected
+                    </h2>
+
+                    <p id="shoppingLocation">
+                        Complete your household questionnaire
+                        to add your shopping location.
+                    </p>
+
+                </div>
+
+                <a
+                    href="questionnaire.html"
+                    class="button button-outline"
+                >
+                    Update Preferences
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- Shopping List -->
+        <section class="shopping-list-section container">
+
+            <div class="section-heading shopping-heading">
+
+                <div>
+
+                    <span class="eyebrow">EVERYTHING YOU NEED</span>
+
+                    <h2>Your grocery items</h2>
+
+                    <p>
+                        Your list combines ingredients required by your
+                        selected meals, minus available pantry stock
+                        where quantities are known.
+                    </p>
+
+                </div>
+
+                <div class="shopping-toolbar-actions">
+
+                    <button
+                        type="button"
+                        class="button button-outline"
+                        id="printShoppingList"
+                    >
+                        🖨️ Print List
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- Shopping List Filters -->
+            <div class="shopping-list-toolbar">
+
+                <div class="form-group">
+
+                    <label for="shoppingSearch">
+                        Search shopping list
+                    </label>
+
+                    <input
+                        type="search"
+                        id="shoppingSearch"
+                        placeholder="Search for an ingredient..."
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="shoppingCategoryFilter">
+                        Filter by category
+                    </label>
+
+                    <select id="shoppingCategoryFilter">
+
+                        <option value="all">All categories</option>
+                        <option value="Vegetables">Vegetables</option>
+                        <option value="Fruits">Fruits</option>
+                        <option value="Meat and Poultry">
+                            Meat and Poultry
+                        </option>
+                        <option value="Fish and Seafood">
+                            Fish and Seafood
+                        </option>
+                        <option value="Dairy and Eggs">
+                            Dairy and Eggs
+                        </option>
+                        <option value="Grains and Bakery">
+                            Grains and Bakery
+                        </option>
+                        <option value="Pantry">Pantry</option>
+                        <option value="Other">Other</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="shoppingStatusFilter">
+                        Purchase status
+                    </label>
+
+                    <select id="shoppingStatusFilter">
+
+                        <option value="all">All items</option>
+                        <option value="needed">Still needed</option>
+                        <option value="purchased">Purchased</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <!-- Add Custom Item -->
+            <div class="add-shopping-item-card">
+
+                <div class="add-item-heading">
+
+                    <h3>Add a shopping item</h3>
+
+                    <p>
+                        Include any extra grocery items not already
+                        included in your meal plan.
+                    </p>
+
+                </div>
+
+                <form id="addShoppingItemForm">
+
+                    <div class="add-item-grid">
+
+                        <div class="form-group">
+
+                            <label for="newItemName">
+                                Item name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="newItemName"
+                                name="itemName"
+                                placeholder="e.g. Washing powder"
+                                maxlength="80"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="newItemQuantity">
+                                Quantity
+                            </label>
+
+                            <input
+                                type="number"
+                                id="newItemQuantity"
+                                name="quantity"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="e.g. 2"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="newItemUnit">
+                                Unit
+                            </label>
+
+                            <select
+                                id="newItemUnit"
+                                name="unit"
+                                required
+                            >
+
+                                <option value="each">Each</option>
+                                <option value="kg">Kilograms</option>
+                                <option value="g">Grams</option>
+                                <option value="L">Litres</option>
+                                <option value="ml">Millilitres</option>
+                                <option value="pack">Packs</option>
+                                <option value="bag">Bags</option>
+                                <option value="bunch">Bunches</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="newItemCategory">
+                                Category
+                            </label>
+
+                            <select
+                                id="newItemCategory"
+                                name="category"
+                                required
+                            >
+
+                                <option value="Vegetables">
+                                    Vegetables
+                                </option>
+
+                                <option value="Fruits">
+                                    Fruits
+                                </option>
+
+                                <option value="Meat and Poultry">
+                                    Meat and Poultry
+                                </option>
+
+                                <option value="Fish and Seafood">
+                                    Fish and Seafood
+                                </option>
+
+                                <option value="Dairy and Eggs">
+                                    Dairy and Eggs
+                                </option>
+
+                                <option value="Grains and Bakery">
+                                    Grains and Bakery
+                                </option>
+
+                                <option value="Pantry">
+                                    Pantry
+                                </option>
+
+                                <option value="Other">
+                                    Other
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="newItemCost">
+                                Estimated unit price (R)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="newItemCost"
+                                name="unitCost"
+                                min="0"
+                                step="0.01"
+                                placeholder="e.g. 25.00"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="button button-primary"
+                    >
+                        + Add Item
+                    </button>
+
+                </form>
+
+            </div>
+
+            <!-- Shopping List Feedback -->
+            <div
+                id="shoppingListMessage"
+                class="form-message"
+                role="status"
+                aria-live="polite"
+            ></div>
+
+            <!-- Empty Shopping List -->
+            <div
+                class="empty-state"
+                id="shoppingEmptyState"
+            >
+
+                <div class="empty-state-icon">🛍️</div>
+
+                <h3>Your shopping list is empty.</h3>
+
+                <p>
+                    Generate a meal plan or add your own grocery items
+                    to get started.
+                </p>
+
+                <a
+                    href="dashboard.html"
+                    class="button button-primary"
+                >
+                    Go to Dashboard
+                </a>
+
+            </div>
+
+            <!-- Items will be inserted here using JavaScript -->
+            <div
+                class="shopping-categories"
+                id="shoppingCategories"
+                aria-live="polite"
+            ></div>
+
+            <!-- Template for a Shopping Category -->
+            <template id="shoppingCategoryTemplate">
+
+                <section class="shopping-category">
+
+                    <div class="category-heading">
+
+                        <h3 class="category-title"></h3>
+
+                        <span class="category-item-count"></span>
+
+                    </div>
+
+                    <div class="shopping-items"></div>
+
+                </section>
+
+            </template>
+
+            <!-- Template for an Individual Shopping Item -->
+            <template id="shoppingItemTemplate">
+
+                <article class="shopping-item">
+
+                    <label class="shopping-item-label">
+
+                        <input
+                            type="checkbox"
+                            class="shopping-item-checkbox"
+                        >
+
+                        <span class="shopping-item-details">
+
+                            <strong class="shopping-item-name"></strong>
+
+                            <span class="shopping-item-quantity"></span>
+
+                        </span>
+
+                    </label>
+
+                    <div class="shopping-item-price">
+
+                        <span class="shopping-item-cost"></span>
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="shopping-item-delete"
+                        aria-label="Remove shopping item"
+                        title="Remove item"
+                    >
+                        &times;
+                    </button>
+
+                </article>
+
+            </template>
+
+        </section>
+
+        <!-- Pantry Reminder -->
+        <section class="pantry-reminder-section container">
+
+            <div class="pantry-reminder-card">
+
+                <div class="pantry-reminder-icon">🏡</div>
+
+                <div>
+
+                    <h2>Check your pantry before you shop.</h2>
+
+                    <p>
+                        You may already have some of the ingredients
+                        on your list. Review your pantry inventory
+                        to avoid buying items you don't need.
+                    </p>
+
+                    <a
+                        href="questionnaire.html"
+                        class="text-link"
+                    >
+                        Update pantry inventory →
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- Budget Information -->
+        <section class="shopping-budget-section container">
+
+            <div class="budget-progress-card">
+
+                <div class="section-heading">
+
+                    <span class="eyebrow">SHOP WITHIN YOUR MEANS</span>
+
+                    <h2>Your grocery budget</h2>
+
+                    <p>
+                        Compare your weekly budget against your estimated
+                        shopping total.
+                    </p>
+
+                </div>
+
+                <div class="shopping-budget-breakdown">
+
+                    <div class="budget-breakdown-row">
+
+                        <span>Weekly grocery budget</span>
+
+                        <strong id="shoppingWeeklyBudget">R0.00</strong>
+
+                    </div>
+
+                    <div class="budget-breakdown-row">
+
+                        <span>Estimated cost of all items</span>
+
+                        <strong id="shoppingTotalCost">R0.00</strong>
+
+                    </div>
+
+                    <div class="budget-breakdown-row">
+
+                        <span>Estimated cost of purchased items</span>
+
+                        <strong id="shoppingPurchasedCost">R0.00</strong>
+
+                    </div>
+
+                    <div class="budget-breakdown-row budget-remaining-row">
+
+                        <span>Remaining budget after planned shopping</span>
+
+                        <strong id="shoppingRemainingBudget">R0.00</strong>
+
+                    </div>
+
+                </div>
+
+                <p class="budget-disclaimer">
+                    Prices are estimates unless confirmed through
+                    a retailer pricing source. Actual checkout prices
+                    may differ.
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- Shopping List Actions -->
+        <section class="shopping-actions-section container">
+
+            <div class="shopping-actions-card">
+
+                <div>
+
+                    <h2>Finished organising your list?</h2>
+
+                    <p>
+                        You can print your shopping list or clear
+                        purchased items once your shopping is complete.
+                    </p>
+
+                </div>
+
+                <div class="shopping-action-buttons">
+
+                    <button
+                        type="button"
+                        class="button button-outline"
+                        id="clearPurchasedItems"
+                    >
+                        Remove Purchased Items
+                    </button>
+
+                    <button
+                        type="button"
+                        class="button button-danger"
+                        id="clearShoppingList"
+                    >
+                        Clear Entire List
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+
+        <div class="container footer-content">
+
+            <div class="footer-brand">
+
+                <a href="index.html" class="brand footer-logo">
+                    <span>MealMate <strong>SA</strong></span>
+                </a>
+
+                <p>
+                    Helping South African households plan smarter,
+                    eat better and spend wisely.
+                </p>
+
+            </div>
+
+            <div class="footer-links">
+
+                <h3>Explore</h3>
+
+                <a href="index.html">Home</a>
+                <a href="questionnaire.html">Get Started</a>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="recipes.html">Recipes</a>
+
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+
+            <div class="container">
+
+                <p>
+                    &copy; <span id="currentYear"></span>
+                    MealMate SA. All rights reserved.
+                </p>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>
