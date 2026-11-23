@@ -1880,6 +1880,12 @@ function addCurrentRecipeToMealPlan() {
 
         name: currentRecipe.name,
 
+        image:
+            currentRecipe.image ||
+            currentRecipe.thumbnail ||
+            currentRecipe.imageUrl ||
+            null,
+
         category: currentRecipe.category,
 
         servings: currentRecipe.servings,

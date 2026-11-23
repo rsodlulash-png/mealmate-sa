@@ -41,26 +41,49 @@ function removeDuplicates(recipes) {
 /**
  * Checks whether a recipe matches the requested diet.
  */
+/**
+ * Checks whether a recipe matches the requested diet.
+ * Dietary values are normalised to avoid case-sensitive errors.
+ */
 function matchesDiet(recipe, diet) {
-    if (!diet || diet === "none") {
+
+    const normalisedDiet = String(diet || "")
+        .trim()
+        .toLowerCase();
+
+    // No dietary restrictions.
+    if (
+        !normalisedDiet ||
+        normalisedDiet === "none" ||
+        normalisedDiet === "no restrictions"
+    ) {
         return true;
     }
 
-    const tags = Array.isArray(recipe.dietTags)
-        ? recipe.dietTags.map(function (tag) {
-            return String(tag).toLowerCase();
+    const tags = Array.isArray(recipe.dietaryTags)
+        ? recipe.dietaryTags.map(function (tag) {
+            return String(tag).trim().toLowerCase();
         })
         : [];
 
-    if (diet === "vegan") {
+    // Vegan households.
+    if (normalisedDiet === "vegan") {
         return tags.includes("vegan");
     }
 
-    if (diet === "vegetarian") {
-        return tags.includes("vegetarian") || tags.includes("vegan");
+    // Vegetarian households can also eat vegan recipes.
+    if (normalisedDiet === "vegetarian") {
+        return (
+            tags.includes("vegetarian") ||
+            tags.includes("vegan")
+        );
     }
 
-    if (diet === "halaal" || diet === "halal") {
+    // Halaal must be explicitly verified.
+    if (
+        normalisedDiet === "halaal" ||
+        normalisedDiet === "halal"
+    ) {
         return recipe.halalCertified === true;
     }
 
@@ -93,25 +116,10 @@ function matchesDislikedIngredients(recipe, dislikes) {
 }
 
 /**
- * Checks whether a recipe belongs to the requested meal type.
+ * Applies household dietary preferences to recipes.
  *
- * TheMealDB categories are not the same as meal occasions.
- * This check only uses the recipe category when a requested
- * meal type happens to match it.
- */
-function matchesMealType(recipe, mealTypes) {
-    if (!Array.isArray(mealTypes) || mealTypes.length === 0) {
-        return true;
-    }
-
-    return mealTypes.some(function (mealType) {
-        return String(recipe.category || "").toLowerCase() ===
-            String(mealType).toLowerCase();
-    });
-}
-
-/**
- * Applies household preferences to recipes.
+ * Meal occasions (Breakfast, Lunch and Dinner) are used
+ * to organise the plan, not to match TheMealDB categories.
  */
 function filterRecipes(recipes, preferences) {
     return recipes.filter(function (recipe) {
@@ -120,8 +128,7 @@ function filterRecipes(recipes, preferences) {
             matchesDislikedIngredients(
                 recipe,
                 preferences.dislikedIngredients
-            ) &&
-            matchesMealType(recipe, preferences.mealTypes)
+            )
         );
     });
 }
@@ -129,30 +136,31 @@ function filterRecipes(recipes, preferences) {
 /**
  * Searches for recipes using available household preferences.
  */
-async function findSuitableRecipes(preferences) {
+async function findSuitableRecipes(preferences, recipeSearch) {
     const searchTerms = Array.isArray(preferences.searchTerms)
         ? preferences.searchTerms
         : ["chicken", "vegetarian", "pasta"];
 
     const results = await Promise.all(
         searchTerms.map(function (term) {
-            return searchMeals({ search: term }).catch(function () {
-                return [];
-            });
+            return recipeSearch({ search: term }).catch(function () {
+    		return [];
+	    });
         })
     );
 
     let recipes = removeDuplicates(results.flat());
 
     // Screen against declared allergies.
-    const allergyResults = filterRecipesByAllergies(
-        recipes,
-        preferences.allergies || []
-    );
+    // Screen recipes against declared household allergies.
+	const allergyResults = filterRecipesByAllergies(
+    	recipes,
+    	preferences.allergies || []
+);
 
-    recipes = allergyResults.filter(function (recipe) {
-        return recipe.suitableByDeclaredAllergies === true;
-    });
+// The allergy utility returns an object.
+// Extract the recipes that passed the allergy screening.
+recipes = allergyResults.recipes;
 
     return filterRecipes(recipes, preferences);
 }
@@ -163,7 +171,7 @@ async function findSuitableRecipes(preferences) {
  * @param {Object} preferences - Validated household preferences.
  * @returns {Promise<Object>} Generated meal plan.
  */
-export async function generateMealPlan(preferences) {
+export async function generateMealPlan(preferences, options = {}) {
     if (!preferences || typeof preferences !== "object") {
         throw new BadRequestError(
             "Household preferences are required to generate a meal plan."
@@ -184,7 +192,17 @@ export async function generateMealPlan(preferences) {
         );
     }
 
-    const recipes = await findSuitableRecipes(preferences);
+        // Use an injected recipe search function during tests.
+	// Normal application requests continue using TheMealDB.
+	const recipeSearch =
+    	    typeof options.searchMeals === "function"
+        	? options.searchMeals
+        	: searchMeals;
+
+        const recipes = await findSuitableRecipes(
+    	    preferences,
+    	    recipeSearch
+        );
 
     if (recipes.length === 0) {
         return {
@@ -195,15 +213,20 @@ export async function generateMealPlan(preferences) {
         };
     }
 
-    const householdPortions = calculateRecipePortions(preferences);
 
     let recipeIndex = 0;
     const mealPlan = [];
+    let householdPortions = null;
 
     for (const day of days) {
-        for (const mealType of mealTypes) {
+    	for (const mealType of mealTypes) {
             const recipe = recipes[recipeIndex % recipes.length];
 
+            // Calculate portions for this recipe and household.
+            householdPortions = calculateRecipePortions(
+    		recipe,
+    		preferences
+	    );
             mealPlan.push({
                 day: day,
                 mealType: mealType,
@@ -219,14 +242,14 @@ export async function generateMealPlan(preferences) {
     }
 
     const budgetComparison = compareMealPlanWithBudget(
-        mealPlan,
-        preferences.weeklyBudget
+    	preferences.weeklyBudget,
+    	mealPlan
     );
 
     return {
         success: true,
         message: "Meal plan generated successfully.",
-        householdServings: householdPortions.householdServings,
+        householdServings: householdPortions.totalHouseholdServings,
         recipeCount: recipes.length,
         mealCount: mealPlan.length,
         mealPlan: mealPlan,

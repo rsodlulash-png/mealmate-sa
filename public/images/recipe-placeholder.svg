@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <rect width="800" height="450" fill="#f1f5ed"/>
+  <circle cx="400" cy="205" r="145" fill="#ffffff" stroke="#d5dfce" stroke-width="12"/>
+  <circle cx="400" cy="205" r="112" fill="#e8efe2"/>
+  <ellipse cx="400" cy="205" rx="78" ry="65" fill="#d69b48"/>
+  <path d="M350 190 Q400 130 450 190 Q470 240 400 260 Q330 240 350 190" fill="#8b5633"/>
+  <circle cx="365" cy="175" r="13" fill="#6d943f"/>
+  <circle cx="430" cy="230" r="15" fill="#6d943f"/>
+  <circle cx="440" cy="170" r="10" fill="#d85b45"/>
+  <text x="400" y="390" font-family="Arial, sans-serif" font-size="27" text-anchor="middle" fill="#315b3d">MealMate SA</text>
+</svg>

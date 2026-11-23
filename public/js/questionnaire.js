@@ -1,15 +1,30 @@
-// ============================================================
-// MEALMATE SA
-// Household Questionnaire
-// File: public/js/questionnaire.js
-// ============================================================
+
+ // ============================================================
+ // MEALMATE SA
+ // Household Questionnaire
+ // File: public/js/questionnaire.js
+ // ============================================================
 
 "use strict";
 
 
 // ============================================================
-// 1. GET FORM ELEMENTS
+// 1. CONFIGURATION AND FORM ELEMENTS
 // ============================================================
+
+const CHILD_AGE_GROUPS = [
+    "0-2 years",
+    "3-5 years",
+    "6-12 years",
+    "13-17 years"
+];
+
+const DIETARY_PREFERENCES = [
+    "No restrictions",
+    "Halaal",
+    "Vegetarian",
+    "Vegan"
+];
 
 const questionnaireForm = document.getElementById(
     "householdQuestionnaire"
@@ -35,15 +50,35 @@ const calorieTargetGroup = document.getElementById(
 
 const calorieTargetInput = document.getElementById("calorieTarget");
 
+const adultCountInput = document.getElementById("adultCount");
+
+const childCountInput = document.getElementById("childCount");
+
+const adultPortionFactorInput = document.getElementById(
+    "adultPortionFactor"
+);
+
+const childrenAgeBreakdown = document.getElementById(
+    "childrenAgeBreakdown"
+);
+
+const childrenCountSummary = document.getElementById(
+    "childrenCountSummary"
+);
+
 
 // ============================================================
-// 2. CHECK THAT THE REQUIRED ELEMENTS EXIST
+// 2. CHECK REQUIRED ELEMENTS AND INITIALISE
 // ============================================================
 
 if (!questionnaireForm) {
-    console.warn("The household questionnaire form was not found.");
+
+    console.warn(
+        "The household questionnaire form was not found."
+    );
 
 } else if (!window.MealMateStorage) {
+
     console.error(
         "MealMateStorage is unavailable. " +
         "Check that storage.js is loaded before questionnaire.js."
@@ -57,52 +92,539 @@ if (!questionnaireForm) {
 
 
 // ============================================================
-// 3. INITIALIZE THE QUESTIONNAIRE
+// 3. INITIALISE THE QUESTIONNAIRE
 // ============================================================
 
 function initializeQuestionnaire() {
 
+    // Restore previously saved information first.
+    const restoration = restoreSavedPreferences();
+
+    // Update the visibility of conditional fields.
     updateConditionalFields();
 
-    // Show or hide the additional retailer input.
+    updateChildFields();
+
+
+    // Retailer selection.
     retailerSelect.addEventListener("change", function () {
+
         updateConditionalFields();
+
+        clearQuestionnaireMessage();
+
     });
 
-    // Show or hide the calorie target input.
+
+    // Calorie preference selection.
     calorieGoalSelect.addEventListener("change", function () {
+
         updateConditionalFields();
+
+        clearQuestionnaireMessage();
+
     });
+
+
+    // Total number of children.
+    childCountInput.addEventListener("input", function () {
+
+        updateChildFields();
+
+        clearQuestionnaireMessage();
+
+    });
+
+
+    childCountInput.addEventListener("change", function () {
+
+        const childCount = Number(childCountInput.value);
+
+        // When there are no children, clear age-group counts.
+        if (childCount === 0) {
+
+            getAgeGroupInputs().forEach(function (input) {
+                input.value = "0";
+            });
+
+        }
+
+        updateChildFields();
+
+    });
+
+
+    // Individual age-group counts.
+    getAgeGroupInputs().forEach(function (input) {
+
+        input.addEventListener("input", function () {
+
+            updateChildFields();
+
+            clearQuestionnaireMessage();
+
+        });
+
+    });
+
+
+    // Adult portion factor.
+    adultPortionFactorInput.addEventListener(
+        "input",
+        clearQuestionnaireMessage
+    );
+
+
+    // Child portion factors.
+    getPortionFactorInputs().forEach(function (input) {
+
+        input.addEventListener("input", function () {
+            clearQuestionnaireMessage();
+        });
+
+    });
+
 
     // Handle form submission.
-    questionnaireForm.addEventListener("submit", handleSubmission);
+    questionnaireForm.addEventListener(
+        "submit",
+        handleSubmission
+    );
 
-    // Restore the default visibility after clearing the form.
+
+    // Restore visibility after resetting the form.
     questionnaireForm.addEventListener("reset", function () {
-        window.setTimeout(updateConditionalFields, 0);
+
+        window.setTimeout(function () {
+
+            updateConditionalFields();
+
+            updateChildFields();
+
+            clearQuestionnaireMessage();
+
+        }, 0);
+
     });
 
-    // Clear old messages when the user edits the form.
+
+    // Clear feedback when the user edits the form.
     questionnaireForm.addEventListener("input", function () {
         clearQuestionnaireMessage();
     });
+
 
     questionnaireForm.addEventListener("change", function () {
         clearQuestionnaireMessage();
     });
 
-    console.log("MealMate SA questionnaire initialized.");
+
+    // Explain when an old saved profile needs a child breakdown.
+    if (restoration.needsChildBreakdown) {
+
+        displayQuestionnaireMessage(
+            "Your previous household profile was restored. " +
+            "Please enter the number of children in each age group " +
+            "and configure their portion factors before saving.",
+            "warning"
+        );
+
+    }
+
+
+    console.log(
+        "MealMate SA questionnaire initialized successfully."
+    );
+
 }
 
 
 // ============================================================
-// 4. SHOW OR HIDE CONDITIONAL QUESTIONS
+// 4. RESTORE PREVIOUSLY SAVED PREFERENCES
+// ============================================================
+
+function restoreSavedPreferences() {
+
+    const saved = window.MealMateStorage.getPreferences();
+
+    if (
+        !saved ||
+        typeof saved !== "object" ||
+        Array.isArray(saved)
+    ) {
+
+        return {
+            restored: false,
+            needsChildBreakdown: false
+        };
+
+    }
+
+
+    // --------------------------------------------------------
+    // A. SHOPPING INFORMATION
+    // --------------------------------------------------------
+
+    const retailerOptions = Array.from(
+        retailerSelect.options
+    ).map(function (option) {
+        return option.value;
+    });
+
+
+    if (
+        retailerOptions.includes(saved.retailer) &&
+        saved.retailer !== "Other"
+    ) {
+
+        retailerSelect.value = saved.retailer;
+
+        otherRetailerInput.value = "";
+
+    } else if (saved.retailer) {
+
+        retailerSelect.value = "Other";
+
+        otherRetailerInput.value =
+            saved.otherRetailer || saved.retailer;
+
+    }
+
+
+    setFieldValue(
+        "shoppingLocation",
+        saved.shoppingLocation
+    );
+
+
+    // --------------------------------------------------------
+    // B. HOUSEHOLD SIZE
+    // --------------------------------------------------------
+
+    setFieldValue(
+        "adultCount",
+        saved.adultCount ?? 1
+    );
+
+    setFieldValue(
+        "childCount",
+        saved.childCount ?? 0
+    );
+
+    setFieldValue(
+        "adultPortionFactor",
+        saved.adultPortionFactor ?? 1
+    );
+
+
+    // --------------------------------------------------------
+    // C. CHILD AGE-GROUP BREAKDOWN
+    // --------------------------------------------------------
+
+    const hasSavedChildBreakdown =
+        saved.childrenByAgeGroup &&
+        typeof saved.childrenByAgeGroup === "object" &&
+        !Array.isArray(saved.childrenByAgeGroup);
+
+
+    getAgeGroupInputs().forEach(function (input) {
+
+        const ageGroup = input.dataset.childAgeCount;
+
+        const count = hasSavedChildBreakdown
+            ? saved.childrenByAgeGroup[ageGroup] ?? 0
+            : 0;
+
+        input.value = String(count);
+
+    });
+
+
+    // --------------------------------------------------------
+    // D. CHILD PORTION FACTORS
+    // --------------------------------------------------------
+
+    getPortionFactorInputs().forEach(function (input) {
+
+        const ageGroup = input.dataset.childPortionFactor;
+
+        const factor = saved.childPortionFactors &&
+            saved.childPortionFactors[ageGroup] !== undefined
+            ? saved.childPortionFactors[ageGroup]
+            : "";
+
+        input.value = factor === null ? "" : String(factor);
+
+    });
+
+
+    // --------------------------------------------------------
+    // E. WEEKLY SCHEDULE
+    // --------------------------------------------------------
+
+    restoreCheckboxValues(
+        "days",
+        saved.days || []
+    );
+
+    restoreCheckboxValues(
+        "mealTypes",
+        saved.mealTypes || []
+    );
+
+
+    // --------------------------------------------------------
+    // F. KITCHEN APPLIANCES
+    // --------------------------------------------------------
+
+    restoreCheckboxValues(
+        "appliances",
+        saved.appliances || []
+    );
+
+
+    // --------------------------------------------------------
+    // G. DIETARY PREFERENCES
+    // --------------------------------------------------------
+
+    restoreRadioValue(
+        "diet",
+        saved.diet || "No restrictions"
+    );
+
+
+    // --------------------------------------------------------
+    // H. COOKING PREFERENCES
+    // --------------------------------------------------------
+
+    restoreCheckboxValues(
+        "cookingStyles",
+        saved.cookingStyles || []
+    );
+
+    setFieldValue(
+        "maxCookingTime",
+        saved.maxCookingTime ?? "Any"
+    );
+
+
+    // --------------------------------------------------------
+    // I. CALORIE PREFERENCES
+    // --------------------------------------------------------
+
+    setFieldValue(
+        "calorieGoalType",
+        saved.calorieGoalType || "none"
+    );
+
+    setFieldValue(
+        "calorieTarget",
+        saved.calorieTarget ?? ""
+    );
+
+
+    // --------------------------------------------------------
+    // J. ALLERGIES
+    // --------------------------------------------------------
+
+    const allergyValues = saved.allergies || [];
+
+    const knownAllergies = getCheckboxOptions("allergies");
+
+    const customAllergies = Array.isArray(
+        saved.customAllergies
+    )
+        ? saved.customAllergies
+        : allergyValues.filter(function (item) {
+            return !knownAllergies.includes(item);
+        });
+
+
+    restoreCheckboxValues(
+        "allergies",
+        allergyValues
+    );
+
+    setFieldValue(
+        "otherAllergies",
+        customAllergies.join(", ")
+    );
+
+
+    // --------------------------------------------------------
+    // K. DISLIKED INGREDIENTS
+    // --------------------------------------------------------
+
+    const dislikedValues =
+        saved.dislikedIngredients || [];
+
+    const knownDislikes = getCheckboxOptions(
+        "dislikedIngredients"
+    );
+
+    const customDislikes = Array.isArray(
+        saved.customDislikes
+    )
+        ? saved.customDislikes
+        : dislikedValues.filter(function (item) {
+            return !knownDislikes.includes(item);
+        });
+
+
+    restoreCheckboxValues(
+        "dislikedIngredients",
+        dislikedValues
+    );
+
+    setFieldValue(
+        "otherDislikes",
+        customDislikes.join(", ")
+    );
+
+
+    // --------------------------------------------------------
+    // L. PANTRY INFORMATION
+    // --------------------------------------------------------
+
+    const savedPantry = Array.isArray(saved.pantryItems)
+        ? saved.pantryItems
+        : window.MealMateStorage.getPantry();
+
+    const pantryText = savedPantry.map(function (item) {
+
+        const unit = item.unit && item.unit !== "each"
+            ? ` ${item.unit}`
+            : "";
+
+        return `${item.name} - ${item.quantity}${unit}`;
+
+    }).join("\n");
+
+
+    setFieldValue(
+        "pantryItems",
+        pantryText
+    );
+
+
+    // --------------------------------------------------------
+    // M. WEEKLY BUDGET
+    // --------------------------------------------------------
+
+    setFieldValue(
+        "weeklyBudget",
+        saved.weeklyBudget ?? ""
+    );
+
+    setFieldValue(
+        "budgetScope",
+        saved.budgetScope || "all-meals"
+    );
+
+
+    // --------------------------------------------------------
+    // N. RETURN RESTORATION INFORMATION
+    // --------------------------------------------------------
+
+    const hasChildren = Number(saved.childCount) > 0;
+
+    return {
+
+        restored: true,
+
+        // Old preferences stored selected age-group names,
+        // but did not record how many children belonged to each.
+        // We deliberately do not guess the missing counts.
+        needsChildBreakdown:
+            hasChildren && !hasSavedChildBreakdown
+
+    };
+
+}
+
+
+// ============================================================
+// 5. FORM RESTORATION HELPERS
+// ============================================================
+
+function setFieldValue(fieldId, value) {
+
+    const element = document.getElementById(fieldId);
+
+    if (!element) {
+        return;
+    }
+
+    if (value !== undefined && value !== null) {
+        element.value = String(value);
+    }
+
+}
+
+
+function restoreCheckboxValues(fieldName, selectedValues) {
+
+    if (!Array.isArray(selectedValues)) {
+        return;
+    }
+
+    const selected = new Set(
+        selectedValues.map(String)
+    );
+
+    const checkboxes = questionnaireForm.querySelectorAll(
+        `input[type="checkbox"][name="${fieldName}"]`
+    );
+
+    checkboxes.forEach(function (checkbox) {
+
+        checkbox.checked = selected.has(checkbox.value);
+
+    });
+
+}
+
+
+function restoreRadioValue(fieldName, selectedValue) {
+
+    const radios = questionnaireForm.querySelectorAll(
+        `input[type="radio"][name="${fieldName}"]`
+    );
+
+    radios.forEach(function (radio) {
+
+        radio.checked = radio.value === selectedValue;
+
+    });
+
+}
+
+
+function getCheckboxOptions(fieldName) {
+
+    const checkboxes = questionnaireForm.querySelectorAll(
+        `input[type="checkbox"][name="${fieldName}"]`
+    );
+
+    return Array.from(checkboxes).map(function (checkbox) {
+        return checkbox.value;
+    });
+
+}
+
+
+// ============================================================
+// 6. CONDITIONAL FIELD VISIBILITY
 // ============================================================
 
 function updateConditionalFields() {
 
-    // Additional retailer field.
-    const isOtherRetailer = retailerSelect.value === "Other";
+    // --------------------------------------------------------
+    // OTHER RETAILER FIELD
+    // --------------------------------------------------------
+
+    const isOtherRetailer =
+        retailerSelect.value === "Other";
 
     otherRetailerGroup.classList.toggle(
         "hidden",
@@ -111,12 +633,11 @@ function updateConditionalFields() {
 
     otherRetailerInput.required = isOtherRetailer;
 
-    if (!isOtherRetailer) {
-        otherRetailerInput.value = "";
-    }
 
+    // --------------------------------------------------------
+    // CALORIE TARGET FIELD
+    // --------------------------------------------------------
 
-    // Calorie target field.
     const needsCalorieTarget =
         calorieGoalSelect.value === "per-adult";
 
@@ -127,22 +648,182 @@ function updateConditionalFields() {
 
     calorieTargetInput.required = needsCalorieTarget;
 
-    if (!needsCalorieTarget) {
-        calorieTargetInput.value = "";
+
+    // --------------------------------------------------------
+    // CHILD AGE-GROUP FIELDS
+    // --------------------------------------------------------
+
+    updateChildFields();
+
+}
+
+
+// ============================================================
+// 7. CHILD AGE-GROUP HELPERS
+// ============================================================
+
+function getAgeGroupInputs() {
+
+    return Array.from(
+        questionnaireForm.querySelectorAll(
+            "[data-child-age-count]"
+        )
+    );
+
+}
+
+
+function getPortionFactorInputs() {
+
+    return Array.from(
+        questionnaireForm.querySelectorAll(
+            "[data-child-portion-factor]"
+        )
+    );
+
+}
+
+
+// ============================================================
+// 8. UPDATE CHILD AGE-GROUP AND PORTION FIELDS
+// ============================================================
+
+function updateChildFields() {
+
+    if (
+        !childCountInput ||
+        !childrenAgeBreakdown
+    ) {
+        return;
+    }
+
+
+    const totalChildren = childCountInput.value === ""
+        ? NaN
+        : Number(childCountInput.value);
+
+    const hasChildren =
+        Number.isInteger(totalChildren) &&
+        totalChildren > 0;
+
+    childrenAgeBreakdown.classList.toggle(
+        "hidden",
+        !hasChildren
+    );
+
+
+    let assignedChildren = 0;
+
+    let hasInvalidCount = false;
+
+
+    CHILD_AGE_GROUPS.forEach(function (ageGroup) {
+
+        const ageInput = getAgeGroupInputs().find(
+            function (input) {
+                return input.dataset.childAgeCount === ageGroup;
+            }
+        );
+
+        const factorGroup = questionnaireForm.querySelector(
+            `[data-portion-factor-group="${ageGroup}"]`
+        );
+
+        const factorInput = getPortionFactorInputs().find(
+            function (input) {
+                return input.dataset.childPortionFactor === ageGroup;
+            }
+        );
+
+
+        if (!ageInput) {
+            return;
+        }
+
+
+        const rawCount = ageInput.value;
+
+        const count = rawCount === ""
+            ? NaN
+            : Number(rawCount);
+
+
+        const validCount =
+            Number.isInteger(count) &&
+            count >= 0 &&
+            count <= 30;
+
+        const hasChildrenInGroup =
+            validCount && count > 0;
+
+
+        if (!validCount) {
+
+            hasInvalidCount = true;
+
+        } else {
+
+            assignedChildren += count;
+
+        }
+
+
+        // Display the portion-factor input only when
+        // the age group contains at least one child.
+        if (factorGroup) {
+
+            factorGroup.classList.toggle(
+                "hidden",
+                !hasChildrenInGroup
+            );
+
+        }
+
+
+        if (factorInput) {
+
+            factorInput.required = hasChildrenInGroup;
+
+        }
+
+    });
+
+
+    // Update the live household count summary.
+    if (childrenCountSummary) {
+
+        if (!hasChildren) {
+
+            childrenCountSummary.textContent =
+                "No children are currently included in the household.";
+
+        } else if (hasInvalidCount) {
+
+            childrenCountSummary.textContent =
+                "Please enter whole numbers for all age-group counts.";
+
+        } else {
+
+            childrenCountSummary.textContent =
+                `${assignedChildren} of ${totalChildren} children assigned to age groups.`;
+
+        }
+
     }
 
 }
 
 
 // ============================================================
-// 5. GET SELECTED CHECKBOX VALUES
+// 9. GET SELECTED CHECKBOX VALUES
 // ============================================================
 
 function getSelectedValues(fieldName) {
 
-    const selectedElements = questionnaireForm.querySelectorAll(
-        `input[name="${fieldName}"]:checked`
-    );
+    const selectedElements =
+        questionnaireForm.querySelectorAll(
+            `input[name="${fieldName}"]:checked`
+        );
 
     return Array.from(selectedElements).map(function (element) {
         return element.value;
@@ -152,7 +833,7 @@ function getSelectedValues(fieldName) {
 
 
 // ============================================================
-// 6. SPLIT CUSTOM INGREDIENTS AND ALLERGIES
+// 10. SPLIT CUSTOM INGREDIENTS AND ALLERGIES
 // ============================================================
 
 function splitCustomList(value) {
@@ -174,7 +855,7 @@ function splitCustomList(value) {
 
 
 // ============================================================
-// 7. REMOVE DUPLICATE VALUES
+// 11. REMOVE DUPLICATE VALUES
 // ============================================================
 
 function removeDuplicates(values) {
@@ -186,10 +867,12 @@ function removeDuplicates(values) {
         const cleanedValue = String(value).trim();
 
         if (cleanedValue) {
+
             uniqueValues.set(
                 cleanedValue.toLowerCase(),
                 cleanedValue
             );
+
         }
 
     });
@@ -200,68 +883,284 @@ function removeDuplicates(values) {
 
 
 // ============================================================
-// 8. VALIDATE HOUSEHOLD INFORMATION
+// 12. READ NUMERIC FORM VALUES
 // ============================================================
 
-function validateQuestionnaire(data) {
+function readNumber(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        String(value).trim() === ""
+    ) {
+        return NaN;
+    }
+
+    return Number(value);
+
+}
+
+
+// ============================================================
+// 13. VALIDATE HOUSEHOLD INFORMATION
+// ============================================================
+
+function validateQuestionnaire(data, retailerSelection) {
 
     const errors = [];
 
-    // Validate supermarket.
-    if (!data.retailer) {
-        errors.push("Please select your preferred supermarket.");
-    }
+
+    // --------------------------------------------------------
+    // A. SHOPPING INFORMATION
+    // --------------------------------------------------------
 
     if (
-        data.retailer === "Other" &&
+        !data.retailer ||
+        typeof data.retailer !== "string" ||
+        !data.retailer.trim()
+    ) {
+
+        errors.push(
+            "Please select or enter your preferred supermarket."
+        );
+
+    }
+
+
+    if (
+        retailerSelection === "Other" &&
         !data.otherRetailer.trim()
     ) {
-        errors.push("Please enter your supermarket name.");
+
+        errors.push(
+            "Please enter your supermarket name."
+        );
+
     }
 
-    // Validate shopping location.
-    if (!data.shoppingLocation.trim()) {
-        errors.push("Please enter your shopping location.");
+
+    if (
+        typeof data.shoppingLocation !== "string" ||
+        !data.shoppingLocation.trim()
+    ) {
+
+        errors.push(
+            "Please enter your shopping location."
+        );
+
     }
 
-    // Validate adults.
+
+    // --------------------------------------------------------
+    // B. ADULTS AND CHILDREN
+    // --------------------------------------------------------
+
     if (
         !Number.isInteger(data.adultCount) ||
         data.adultCount < 1 ||
         data.adultCount > 30
     ) {
-        errors.push("Enter a valid number of adults between 1 and 30.");
+
+        errors.push(
+            "Enter a valid number of adults between 1 and 30."
+        );
+
     }
 
-    // Validate children.
+
     if (
         !Number.isInteger(data.childCount) ||
         data.childCount < 0 ||
         data.childCount > 30
     ) {
-        errors.push("Enter a valid number of children between 0 and 30.");
+
+        errors.push(
+            "Enter a valid number of children between 0 and 30."
+        );
+
     }
 
-    // Require at least one day.
-    if (data.days.length === 0) {
-        errors.push("Please select at least one day for meal planning.");
-    }
 
-    // Require at least one meal type.
-    if (data.mealTypes.length === 0) {
-        errors.push("Please select at least one meal category.");
-    }
+    // --------------------------------------------------------
+    // C. ADULT PORTION FACTOR
+    // --------------------------------------------------------
 
-    // Validate weekly grocery budget.
     if (
-        !Number.isFinite(data.weeklyBudget) ||
-        data.weeklyBudget < 1 ||
-        data.weeklyBudget > 100000
+        !Number.isFinite(data.adultPortionFactor) ||
+        data.adultPortionFactor <= 0 ||
+        data.adultPortionFactor > 10
     ) {
-        errors.push("Enter a weekly budget between R1 and R100,000.");
+
+        errors.push(
+            "Enter a valid adult portion factor greater than 0 and no greater than 10."
+        );
+
     }
 
-    // Validate calorie target when selected.
+
+    // --------------------------------------------------------
+    // D. CHILDREN'S AGE-GROUP COUNTS
+    // --------------------------------------------------------
+
+    if (
+        !data.childrenByAgeGroup ||
+        typeof data.childrenByAgeGroup !== "object" ||
+        Array.isArray(data.childrenByAgeGroup)
+    ) {
+
+        errors.push(
+            "Please provide children's age-group information."
+        );
+
+    } else {
+
+        let groupedChildCount = 0;
+
+        let invalidGroupCount = false;
+
+
+        CHILD_AGE_GROUPS.forEach(function (ageGroup) {
+
+            const count = data.childrenByAgeGroup[ageGroup];
+
+            if (
+                !Number.isInteger(count) ||
+                count < 0 ||
+                count > 30
+            ) {
+
+                invalidGroupCount = true;
+
+            } else {
+
+                groupedChildCount += count;
+
+            }
+
+        });
+
+
+        if (invalidGroupCount) {
+
+            errors.push(
+                "Enter a valid whole number between 0 and 30 for every child age group."
+            );
+
+        } else if (
+            Number.isInteger(data.childCount) &&
+            groupedChildCount !== data.childCount
+        ) {
+
+            errors.push(
+                `The age-group counts add up to ${groupedChildCount}, but your household has ${data.childCount} children. Please correct the counts.`
+            );
+
+        }
+
+    }
+
+
+    // --------------------------------------------------------
+    // E. CHILD PORTION FACTORS
+    // --------------------------------------------------------
+
+    CHILD_AGE_GROUPS.forEach(function (ageGroup) {
+
+        const groupCount = data.childrenByAgeGroup
+            ? data.childrenByAgeGroup[ageGroup]
+            : 0;
+
+
+        if (!Number.isInteger(groupCount) || groupCount <= 0) {
+            return;
+        }
+
+
+        const factor = data.childPortionFactors
+            ? data.childPortionFactors[ageGroup]
+            : undefined;
+
+
+        if (
+            !Number.isFinite(factor) ||
+            factor <= 0 ||
+            factor > 10
+        ) {
+
+            errors.push(
+                `Please enter a valid portion factor for children aged ${ageGroup}.`
+            );
+
+        }
+
+    });
+
+
+    // --------------------------------------------------------
+    // F. WEEKLY SCHEDULE
+    // --------------------------------------------------------
+
+    if (
+        !Array.isArray(data.days) ||
+        data.days.length === 0
+    ) {
+
+        errors.push(
+            "Please select at least one day for meal planning."
+        );
+
+    }
+
+
+    if (
+        !Array.isArray(data.mealTypes) ||
+        data.mealTypes.length === 0
+    ) {
+
+        errors.push(
+            "Please select at least one meal category."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // G. DIETARY PREFERENCES
+    // --------------------------------------------------------
+
+    if (!DIETARY_PREFERENCES.includes(data.diet)) {
+
+        errors.push(
+            "Please select a valid dietary preference."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // H. COOKING TIME
+    // --------------------------------------------------------
+
+    if (
+        data.maxCookingTime !== "Any" &&
+        (
+            !Number.isInteger(data.maxCookingTime) ||
+            data.maxCookingTime < 1 ||
+            data.maxCookingTime > 600
+        )
+    ) {
+
+        errors.push(
+            "Please select a valid maximum cooking time."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // I. CALORIE TARGET
+    // --------------------------------------------------------
+
     if (data.calorieGoalType === "per-adult") {
 
         if (
@@ -269,19 +1168,70 @@ function validateQuestionnaire(data) {
             data.calorieTarget < 500 ||
             data.calorieTarget > 6000
         ) {
+
             errors.push(
                 "Enter an adult daily calorie target between 500 and 6,000 kcal."
             );
+
         }
 
     }
+
+
+    // --------------------------------------------------------
+    // J. WEEKLY GROCERY BUDGET
+    // --------------------------------------------------------
+
+    if (
+        !Number.isFinite(data.weeklyBudget) ||
+        data.weeklyBudget < 1 ||
+        data.weeklyBudget > 100000
+    ) {
+
+        errors.push(
+            "Enter a weekly budget between R1 and R100,000."
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // K. BUDGET SCOPE
+    // --------------------------------------------------------
 
     if (
         data.budgetScope !== "all-meals" &&
         data.budgetScope !== "selected-meals"
     ) {
-        errors.push("Please select a valid budget category.");
+
+        errors.push(
+            "Please select a valid budget category."
+        );
+
     }
+
+
+    // --------------------------------------------------------
+    // L. CUSTOM ALLERGIES AND DISLIKES
+    // --------------------------------------------------------
+
+    if (data.allergies.length > 30) {
+
+        errors.push(
+            "You can enter a maximum of 30 allergies."
+        );
+
+    }
+
+
+    if (data.dislikedIngredients.length > 50) {
+
+        errors.push(
+            "You can enter a maximum of 50 disliked ingredients."
+        );
+
+    }
+
 
     return errors;
 
@@ -289,7 +1239,7 @@ function validateQuestionnaire(data) {
 
 
 // ============================================================
-// 9. NORMALISE PANTRY UNITS
+// 14. NORMALISE PANTRY UNITS
 // ============================================================
 
 function normalisePantryUnit(unit) {
@@ -301,6 +1251,7 @@ function normalisePantryUnit(unit) {
     const cleanedUnit = unit.toLowerCase().trim();
 
     const unitMap = {
+
         kg: "kg",
         kgs: "kg",
         kilogram: "kg",
@@ -325,13 +1276,18 @@ function normalisePantryUnit(unit) {
         each: "each",
         piece: "each",
         pieces: "each",
+
         pack: "pack",
         packs: "pack",
+
         bag: "bag",
         bags: "bag",
+
         bunch: "bunch",
         bunches: "bunch",
+
         dozen: "dozen"
+
     };
 
     return unitMap[cleanedUnit] || cleanedUnit;
@@ -340,10 +1296,44 @@ function normalisePantryUnit(unit) {
 
 
 // ============================================================
-// 10. PARSE PANTRY INVENTORY
+// 15. CREATE PANTRY ITEM ID
 // ============================================================
 
-// Expected format:
+function createPantryId() {
+
+    if (
+        window.MealMateApp &&
+        typeof window.MealMateApp.generateId === "function"
+    ) {
+
+        return window.MealMateApp.generateId();
+
+    }
+
+    if (
+        typeof crypto !== "undefined" &&
+        typeof crypto.randomUUID === "function"
+    ) {
+
+        return crypto.randomUUID();
+
+    }
+
+    return (
+        "pantry-" +
+        Date.now() +
+        "-" +
+        Math.random().toString(36).slice(2, 10)
+    );
+
+}
+
+
+// ============================================================
+// 16. PARSE PANTRY INVENTORY
+// ============================================================
+
+// Expected formats:
 //
 // Rice - 2 kg
 // Cooking oil - 1 litre
@@ -353,12 +1343,18 @@ function normalisePantryUnit(unit) {
 
 function parsePantryInventory(pantryText) {
 
-    if (!pantryText.trim()) {
+    if (
+        typeof pantryText !== "string" ||
+        !pantryText.trim()
+    ) {
+
         return {
             items: [],
             invalidLines: []
         };
+
     }
+
 
     const lines = pantryText
         .split("\n")
@@ -367,8 +1363,11 @@ function parsePantryInventory(pantryText) {
         })
         .filter(Boolean);
 
+
     const items = [];
+
     const invalidLines = [];
+
 
     lines.forEach(function (line) {
 
@@ -376,10 +1375,15 @@ function parsePantryInventory(pantryText) {
             /^(.+?)\s*[-:]\s*(\d+(?:[.,]\d+)?)\s*([a-zA-Z]+)?$/
         );
 
+
         if (!match) {
+
             invalidLines.push(line);
+
             return;
+
         }
+
 
         const name = match[1].trim();
 
@@ -387,58 +1391,195 @@ function parsePantryInventory(pantryText) {
             match[2].replace(",", ".")
         );
 
-        const unit = normalisePantryUnit(match[3] || "each");
+        const unit = normalisePantryUnit(
+            match[3] || "each"
+        );
+
 
         if (
             !name ||
             !Number.isFinite(quantity) ||
             quantity <= 0
         ) {
+
             invalidLines.push(line);
+
             return;
+
         }
 
+
         items.push({
-            id: window.MealMateApp
-                ? window.MealMateApp.generateId()
-                : `pantry-${Date.now()}-${items.length}`,
 
-            name: name,
+            id: createPantryId(),
 
-            quantity: quantity,
+            name,
 
-            unit: unit
+            quantity,
+
+            unit
+
         });
 
     });
 
+
     return {
-        items: items,
-        invalidLines: invalidLines
+
+        items,
+
+        invalidLines
+
     };
 
 }
 
 
 // ============================================================
-// 11. COLLECT FORM INFORMATION
+// 17. COLLECT CHILD AGE-GROUP INFORMATION
+// ============================================================
+
+function collectChildrenByAgeGroup() {
+
+    const childrenByAgeGroup = {};
+
+
+    CHILD_AGE_GROUPS.forEach(function (ageGroup) {
+
+        childrenByAgeGroup[ageGroup] = 0;
+
+    });
+
+
+    getAgeGroupInputs().forEach(function (input) {
+
+        const ageGroup = input.dataset.childAgeCount;
+
+        childrenByAgeGroup[ageGroup] = readNumber(
+            input.value
+        );
+
+    });
+
+
+    return childrenByAgeGroup;
+
+}
+
+
+// ============================================================
+// 18. COLLECT CHILD PORTION FACTORS
+// ============================================================
+
+function collectChildPortionFactors(childrenByAgeGroup) {
+
+    const childPortionFactors = {};
+
+
+    getPortionFactorInputs().forEach(function (input) {
+
+        const ageGroup = input.dataset.childPortionFactor;
+
+        // Only include factors for age groups
+        // that actually contain children.
+        if (
+            childrenByAgeGroup[ageGroup] <= 0 ||
+            !Number.isFinite(childrenByAgeGroup[ageGroup])
+        ) {
+            return;
+        }
+
+
+        if (input.value.trim() === "") {
+            return;
+        }
+
+
+        childPortionFactors[ageGroup] = readNumber(
+            input.value
+        );
+
+    });
+
+
+    return childPortionFactors;
+
+}
+
+
+// ============================================================
+// 19. COLLECT ALL QUESTIONNAIRE INFORMATION
 // ============================================================
 
 function collectQuestionnaireData() {
 
     const formData = new FormData(questionnaireForm);
 
-    const retailer = formData.get("retailer");
 
-    const diet = formData.get("diet");
+    // --------------------------------------------------------
+    // A. BASIC FORM VALUES
+    // --------------------------------------------------------
 
-    const calorieGoalType = formData.get("calorieGoalType");
+    const retailerSelection = String(
+        formData.get("retailer") || ""
+    );
+
+    const otherRetailer = String(
+        formData.get("otherRetailer") || ""
+    ).trim();
+
+    const calorieGoalType = String(
+        formData.get("calorieGoalType") || "none"
+    );
+
+
+    // --------------------------------------------------------
+    // B. HOUSEHOLD COUNTS
+    // --------------------------------------------------------
+
+    const adultCount = readNumber(
+        formData.get("adultCount")
+    );
+
+    const childCount = readNumber(
+        formData.get("childCount")
+    );
+
+    const adultPortionFactor = readNumber(
+        formData.get("adultPortionFactor")
+    );
+
+
+    const childrenByAgeGroup =
+        collectChildrenByAgeGroup();
+
+
+    const childAgeGroups = CHILD_AGE_GROUPS.filter(
+        function (ageGroup) {
+
+            const count = childrenByAgeGroup[ageGroup];
+
+            return Number.isFinite(count) && count > 0;
+
+        }
+    );
+
+
+    const childPortionFactors =
+        collectChildPortionFactors(childrenByAgeGroup);
+
+
+    // --------------------------------------------------------
+    // C. ALLERGIES AND DISLIKES
+    // --------------------------------------------------------
 
     const otherAllergies = splitCustomList(
         formData.get("otherAllergies")
     );
 
-    const selectedAllergies = getSelectedValues("allergies");
+    const selectedAllergies = getSelectedValues(
+        "allergies"
+    );
 
     const otherDislikes = splitCustomList(
         formData.get("otherDislikes")
@@ -448,43 +1589,66 @@ function collectQuestionnaireData() {
         "dislikedIngredients"
     );
 
-    const adultCount = Number(formData.get("adultCount"));
 
-    const childCount = Number(formData.get("childCount"));
-
-    const weeklyBudget = Number(formData.get("weeklyBudget"));
+    // --------------------------------------------------------
+    // D. CALORIE TARGET
+    // --------------------------------------------------------
 
     const calorieTarget = calorieGoalType === "per-adult"
-        ? Number(formData.get("calorieTarget"))
+        ? readNumber(formData.get("calorieTarget"))
         : null;
 
-    const pantryResult = parsePantryInventory(
-        formData.get("pantryItems") || ""
+
+    // --------------------------------------------------------
+    // E. WEEKLY BUDGET
+    // --------------------------------------------------------
+
+    const weeklyBudget = readNumber(
+        formData.get("weeklyBudget")
     );
 
 
-    // Build the household preferences object.
+    // --------------------------------------------------------
+    // F. PANTRY INVENTORY
+    // --------------------------------------------------------
+
+    const pantryResult = parsePantryInventory(
+        String(formData.get("pantryItems") || "")
+    );
+
+
+    // --------------------------------------------------------
+    // G. BUILD HOUSEHOLD PREFERENCES
+    // --------------------------------------------------------
+
     const preferences = {
 
-        retailer: retailer === "Other"
-            ? String(formData.get("otherRetailer") || "").trim()
-            : retailer,
+        retailer: retailerSelection === "Other"
+            ? otherRetailer
+            : retailerSelection,
 
-        otherRetailer: retailer === "Other"
-            ? String(formData.get("otherRetailer") || "").trim()
+        otherRetailer: retailerSelection === "Other"
+            ? otherRetailer
             : "",
 
         shoppingLocation: String(
             formData.get("shoppingLocation") || ""
         ).trim(),
 
-        adultCount: adultCount,
+        adultCount,
 
-        childCount: childCount,
+        childCount,
 
-        totalHouseholdMembers: adultCount + childCount,
+        totalHouseholdMembers:
+            adultCount + childCount,
 
-        childAgeGroups: getSelectedValues("childAgeGroups"),
+        adultPortionFactor,
+
+        childAgeGroups,
+
+        childrenByAgeGroup,
+
+        childPortionFactors,
 
         days: getSelectedValues("days"),
 
@@ -492,33 +1656,38 @@ function collectQuestionnaireData() {
 
         appliances: getSelectedValues("appliances"),
 
-        diet: diet,
+        diet: formData.get("diet"),
 
         cookingStyles: getSelectedValues("cookingStyles"),
 
-        maxCookingTime: formData.get("maxCookingTime") === "Any"
-            ? "Any"
-            : Number(formData.get("maxCookingTime")),
+        maxCookingTime:
+            formData.get("maxCookingTime") === "Any"
+                ? "Any"
+                : readNumber(formData.get("maxCookingTime")),
 
-        calorieGoalType: calorieGoalType,
+        calorieGoalType,
 
-        calorieTarget: calorieTarget,
+        calorieTarget,
 
         allergies: removeDuplicates([
             ...selectedAllergies,
             ...otherAllergies
         ]),
 
-        customAllergies: otherAllergies,
+        customAllergies: removeDuplicates(
+            otherAllergies
+        ),
 
         dislikedIngredients: removeDuplicates([
             ...selectedDislikes,
             ...otherDislikes
         ]),
 
-        customDislikes: otherDislikes,
+        customDislikes: removeDuplicates(
+            otherDislikes
+        ),
 
-        weeklyBudget: weeklyBudget,
+        weeklyBudget,
 
         budgetScope: formData.get("budgetScope"),
 
@@ -530,67 +1699,119 @@ function collectQuestionnaireData() {
 
 
     return {
-        preferences: preferences,
-        pantryResult: pantryResult
+
+        preferences,
+
+        pantryResult,
+
+        retailerSelection
+
     };
 
 }
 
 
 // ============================================================
-// 12. DISPLAY QUESTIONNAIRE FEEDBACK
+// 20. DISPLAY QUESTIONNAIRE FEEDBACK
 // ============================================================
 
-function displayQuestionnaireMessage(message, type = "success") {
+function displayQuestionnaireMessage(
+    message,
+    type = "success"
+) {
 
+    if (!questionnaireMessage) {
+        return;
+    }
+
+
+    questionnaireMessage.textContent = message;
+
+    questionnaireMessage.classList.remove(
+        "hidden",
+        "error-message",
+        "success-message",
+        "warning-note"
+    );
+
+
+    if (type === "error") {
+
+        questionnaireMessage.classList.add(
+            "error-message"
+        );
+
+    } else if (type === "warning") {
+
+        questionnaireMessage.classList.add(
+            "warning-note"
+        );
+
+    } else {
+
+        questionnaireMessage.classList.add(
+            "success-message"
+        );
+
+    }
+
+
+    // Use the shared application helper for normal messages.
     if (
+        type !== "warning" &&
         window.MealMateApp &&
         typeof window.MealMateApp.showMessage === "function"
     ) {
+
         window.MealMateApp.showMessage(
             questionnaireMessage,
             message,
             type
         );
 
-        return;
     }
-
-    questionnaireMessage.textContent = message;
-
-    questionnaireMessage.classList.remove("hidden");
-
-    questionnaireMessage.classList.toggle(
-        "error-message",
-        type === "error"
-    );
-
-    questionnaireMessage.classList.toggle(
-        "success-message",
-        type === "success"
-    );
-
-}
-
-
-function clearQuestionnaireMessage() {
-
-    if (
-        window.MealMateApp &&
-        typeof window.MealMateApp.clearMessage === "function"
-    ) {
-        window.MealMateApp.clearMessage(questionnaireMessage);
-        return;
-    }
-
-    questionnaireMessage.textContent = "";
-    questionnaireMessage.classList.add("hidden");
 
 }
 
 
 // ============================================================
-// 13. HANDLE QUESTIONNAIRE SUBMISSION
+// 21. CLEAR QUESTIONNAIRE FEEDBACK
+// ============================================================
+
+function clearQuestionnaireMessage() {
+
+    if (!questionnaireMessage) {
+        return;
+    }
+
+
+    if (
+        window.MealMateApp &&
+        typeof window.MealMateApp.clearMessage === "function"
+    ) {
+
+        window.MealMateApp.clearMessage(
+            questionnaireMessage
+        );
+
+    }
+
+
+    questionnaireMessage.textContent = "";
+
+    questionnaireMessage.classList.add("hidden");
+
+    questionnaireMessage.classList.remove(
+        "error-message",
+        "success-message",
+        "warning-note"
+    );
+
+}
+
+
+// ============================================================
+// 22. HANDLE QUESTIONNAIRE SUBMISSION
 // ============================================================
 
 function handleSubmission(event) {
@@ -599,15 +1820,30 @@ function handleSubmission(event) {
 
     clearQuestionnaireMessage();
 
+
+    // --------------------------------------------------------
+    // A. COLLECT FORM INFORMATION
+    // --------------------------------------------------------
+
     const collectedData = collectQuestionnaireData();
 
     const preferences = collectedData.preferences;
 
     const pantryResult = collectedData.pantryResult;
 
+    const retailerSelection =
+        collectedData.retailerSelection;
 
-    // Validate all important information.
-    const errors = validateQuestionnaire(preferences);
+
+    // --------------------------------------------------------
+    // B. VALIDATE HOUSEHOLD INFORMATION
+    // --------------------------------------------------------
+
+    const errors = validateQuestionnaire(
+        preferences,
+        retailerSelection
+    );
+
 
     if (errors.length > 0) {
 
@@ -617,10 +1853,14 @@ function handleSubmission(event) {
         );
 
         return;
+
     }
 
 
-    // Check whether browser storage is available.
+    // --------------------------------------------------------
+    // C. CHECK BROWSER STORAGE
+    // --------------------------------------------------------
+
     if (!window.MealMateStorage.isStorageAvailable()) {
 
         displayQuestionnaireMessage(
@@ -630,32 +1870,45 @@ function handleSubmission(event) {
         );
 
         return;
+
     }
 
 
-    // Preserve the original creation date when editing preferences.
+    // --------------------------------------------------------
+    // D. PRESERVE THE ORIGINAL CREATION DATE
+    // --------------------------------------------------------
+
     const existingPreferences =
         window.MealMateStorage.getPreferences();
+
 
     if (
         existingPreferences &&
         existingPreferences.createdAt
     ) {
-        preferences.createdAt = existingPreferences.createdAt;
+
+        preferences.createdAt =
+            existingPreferences.createdAt;
+
     }
 
 
-    // Save preferences and pantry inventory.
-    const pantrySaved = window.MealMateStorage.savePantry(
-        pantryResult.items
-    );
+    // --------------------------------------------------------
+    // E. SAVE PANTRY AND HOUSEHOLD PREFERENCES
+    // --------------------------------------------------------
 
-    const preferencesSaved = window.MealMateStorage.savePreferences(
-        preferences
-    );
+    const pantrySaved =
+        window.MealMateStorage.savePantry(
+            pantryResult.items
+        );
 
 
-    // Stop if either operation fails.
+    const preferencesSaved =
+        window.MealMateStorage.savePreferences(
+            preferences
+        );
+
+
     if (!pantrySaved || !preferencesSaved) {
 
         displayQuestionnaireMessage(
@@ -665,19 +1918,27 @@ function handleSubmission(event) {
         );
 
         return;
+
     }
 
 
-    // Record the user's activity.
+    // --------------------------------------------------------
+    // F. RECORD USER ACTIVITY
+    // --------------------------------------------------------
+
     window.MealMateStorage.addActivity(
         "Household preferences updated",
         "preferences"
     );
 
 
-    // Inform the user about pantry entries that were not understood.
+    // --------------------------------------------------------
+    // G. DISPLAY SUCCESS FEEDBACK
+    // --------------------------------------------------------
+
     let successMessage =
         "Your household preferences have been saved successfully!";
+
 
     if (pantryResult.invalidLines.length > 0) {
 
@@ -696,7 +1957,10 @@ function handleSubmission(event) {
     );
 
 
-    // Redirect after the success message has been displayed.
+    // --------------------------------------------------------
+    // H. REDIRECT TO THE DASHBOARD
+    // --------------------------------------------------------
+
     window.setTimeout(function () {
 
         window.location.href = "dashboard.html";

@@ -36,11 +36,13 @@ router.post(
             );
         }
 
-        // Validate the information received from the frontend.
-        const preferences = validateMealPlanRequest(req.body);
+        const validatedData = validateMealPlanRequest(req.body);
 
-        // Generate the household meal plan.
-        const result = await generateMealPlan(preferences);
+	// Extract the validated household preferences.
+	const preferences = validatedData.preferences;
+
+	// Generate the household meal plan.
+	const result = await generateMealPlan(preferences);
 
         return res.status(200).json(result);
     })

@@ -56,15 +56,6 @@
                 return;
             }
 
-            if (Array.isArray(value)) {
-
-                value.forEach(function (item) {
-                    query.append(key, String(item));
-                });
-
-                return;
-            }
-
             query.append(key, String(value));
 
         });
@@ -89,6 +80,7 @@
         }, REQUEST_TIMEOUT);
 
         const requestOptions = {
+
             method: options.method || "GET",
 
             headers: {
@@ -99,6 +91,7 @@
             signal: controller.signal,
 
             credentials: "same-origin"
+
         };
 
 
@@ -219,16 +212,11 @@
 
             search: filters.search,
 
-            category: filters.category,
-
-            diet: filters.diet,
-
-            maxTime: filters.maxTime,
-
-            sort: filters.sort
+            category: filters.category
 
         });
 
+        // The backend currently supports search and category.
         return request(`/recipes${query}`);
 
     }
@@ -243,13 +231,17 @@
         if (
             recipeId === undefined ||
             recipeId === null ||
-            String(recipeId).trim() === ""
+            !/^\d+$/.test(String(recipeId).trim())
         ) {
-            throw new Error("A valid recipe ID is required.");
+
+            throw new Error(
+                "A valid numeric recipe ID is required."
+            );
+
         }
 
         return request(
-            `/recipes/${encodeURIComponent(String(recipeId))}`
+            `/recipes/${encodeURIComponent(String(recipeId).trim())}`
         );
 
     }
@@ -263,12 +255,17 @@
 
         if (
             !preferences ||
-            typeof preferences !== "object"
+            typeof preferences !== "object" ||
+            Array.isArray(preferences)
         ) {
-            throw new Error("Valid household preferences are required.");
+
+            throw new Error(
+                "Valid household preferences are required."
+            );
+
         }
 
-        return request("/meal-plans", {
+        return request("/meal-plans/generate", {
 
             method: "POST",
 
@@ -285,26 +282,38 @@
     // 8. GET GROCERY PRICE INFORMATION
     // ========================================================
 
-    async function getGroceryPrices(items, retailer = "") {
+    async function getGroceryPrices(items) {
 
-        if (!Array.isArray(items)) {
+        if (!Array.isArray(items) || items.length === 0) {
 
             throw new Error(
-                "Grocery items must be provided as an array."
+                "Please provide at least one grocery item."
             );
 
         }
 
-        return request("/prices", {
+        const validItems = items.map(function (item) {
 
-            method: "POST",
-
-            body: {
-                items: items,
-                retailer: retailer
+            if (typeof item !== "string" || !item.trim()) {
+                throw new Error(
+                    "Every grocery item must be a non-empty string."
+                );
             }
 
+            return item.trim();
+
         });
+
+        const query = buildQuery({
+
+            items: validItems.join(",")
+
+        });
+
+        // Backend route:
+        // GET /api/prices?items=rice,eggs,milk
+
+        return request(`/prices${query}`);
 
     }
 
@@ -313,25 +322,26 @@
     // 9. GET NUTRITION INFORMATION
     // ========================================================
 
-    async function getNutrition(ingredients) {
+    async function getNutrition(recipeId) {
 
-        if (!Array.isArray(ingredients)) {
+        if (
+            recipeId === undefined ||
+            recipeId === null ||
+            !/^\d+$/.test(String(recipeId).trim())
+        ) {
 
             throw new Error(
-                "Ingredients must be provided as an array."
+                "A valid numeric recipe ID is required."
             );
 
         }
 
-        return request("/nutrition", {
+        // Backend retrieves the recipe and extracts ingredients.
+        // GET /api/nutrition/:recipeId
 
-            method: "POST",
-
-            body: {
-                ingredients: ingredients
-            }
-
-        });
+        return request(
+            `/nutrition/${encodeURIComponent(String(recipeId).trim())}`
+        );
 
     }
 
@@ -351,7 +361,7 @@
     // 11. PUBLIC API FUNCTIONS
     // ========================================================
 
-    // Other frontend files will access these functions through:
+    // Other frontend files access these functions through:
     // window.MealMateAPI
 
     window.MealMateAPI = Object.freeze({

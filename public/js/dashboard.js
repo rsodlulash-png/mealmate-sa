@@ -1,3 +1,4 @@
+
 // ============================================================
 // MEALMATE SA
 // Dashboard Management
@@ -9,77 +10,81 @@
 (function () {
 
     // ========================================================
-    // 1. GET DASHBOARD ELEMENTS
+    // 1. CONFIGURATION
     // ========================================================
 
-    const householdSizeElement = document.getElementById("householdSize");
-    const householdBreakdownElement = document.getElementById(
-        "householdBreakdown"
-    );
+    const DAYS_OF_WEEK = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+    ];
 
-    const dietaryPreferenceElement = document.getElementById(
-        "dietaryPreference"
-    );
-
-    const preferredRetailerElement = document.getElementById(
-        "preferredRetailer"
-    );
-
-    const shoppingLocationElement = document.getElementById(
-        "shoppingLocation"
-    );
-
-    const weeklyBudgetElement = document.getElementById(
-        "weeklyBudgetValue"
-    );
-
-    const estimatedSpendElement = document.getElementById(
-        "estimatedSpend"
-    );
-
-    const budgetRemainingElement = document.getElementById(
-        "budgetRemaining"
-    );
-
-    const budgetProgressText = document.getElementById(
-        "budgetProgressText"
-    );
-
-    const budgetPercentageElement = document.getElementById(
-        "budgetPercentage"
-    );
-
-    const budgetProgressFill = document.getElementById(
-        "budgetProgressFill"
-    );
-
-    const budgetProgressTrack = document.getElementById(
-        "budgetProgressTrack"
-    );
-
-    const currentWeekLabel = document.getElementById(
-        "currentWeekLabel"
-    );
-
-    const mealPlanContainer = document.getElementById(
-        "mealPlanContainer"
-    );
-
-    const dashboardEmptyState = document.getElementById(
-        "dashboardEmptyState"
-    );
-
-    const generateMealPlanButton = document.getElementById(
-        "generateMealPlanButton"
-    );
-
-    const recentActivityElement = document.getElementById(
-        "recentActivity"
-    );
+    const RECIPE_PLACEHOLDER =
+        "images/recipe-placeholder.svg";
 
 
     // ========================================================
-    // 2. CHECK REQUIRED DEPENDENCIES
+    // 2. GET DASHBOARD ELEMENTS
+    // ========================================================
+
+    const householdSizeElement =
+        document.getElementById("householdSize");
+
+    const householdBreakdownElement =
+        document.getElementById("householdBreakdown");
+
+    const dietaryPreferenceElement =
+        document.getElementById("dietaryPreference");
+
+    const preferredRetailerElement =
+        document.getElementById("preferredRetailer");
+
+    const shoppingLocationElement =
+        document.getElementById("shoppingLocation");
+
+    const weeklyBudgetElement =
+        document.getElementById("weeklyBudgetValue");
+
+    const estimatedSpendElement =
+        document.getElementById("estimatedSpend");
+
+    const budgetRemainingElement =
+        document.getElementById("budgetRemaining");
+
+    const budgetProgressText =
+        document.getElementById("budgetProgressText");
+
+    const budgetPercentageElement =
+        document.getElementById("budgetPercentage");
+
+    const budgetProgressFill =
+        document.getElementById("budgetProgressFill");
+
+    const budgetProgressTrack =
+        document.getElementById("budgetProgressTrack");
+
+    const currentWeekLabel =
+        document.getElementById("currentWeekLabel");
+
+    const mealPlanContainer =
+        document.getElementById("mealPlanContainer");
+
+    const dashboardEmptyState =
+        document.getElementById("dashboardEmptyState");
+
+    const generateMealPlanButton =
+        document.getElementById("generateMealPlanButton");
+
+    const recentActivityElement =
+        document.getElementById("recentActivity");
+
+
+    // ========================================================
+    // 3. CHECK REQUIRED DEPENDENCIES
     // ========================================================
 
     if (
@@ -97,8 +102,19 @@
     }
 
 
+    if (!mealPlanContainer) {
+
+        console.error(
+            "The meal plan container was not found."
+        );
+
+        return;
+
+    }
+
+
     // ========================================================
-    // 3. INITIALIZE DASHBOARD
+    // 4. INITIALIZE DASHBOARD
     // ========================================================
 
     function initializeDashboard() {
@@ -113,6 +129,7 @@
 
         loadRecentActivity();
 
+
         if (generateMealPlanButton) {
 
             generateMealPlanButton.addEventListener(
@@ -122,13 +139,16 @@
 
         }
 
-        console.log("MealMate SA dashboard initialized.");
+
+        console.log(
+            "MealMate SA dashboard initialized successfully."
+        );
 
     }
 
 
     // ========================================================
-    // 4. REUSABLE TEXT UPDATE FUNCTION
+    // 5. REUSABLE TEXT UPDATE FUNCTION
     // ========================================================
 
     function updateText(element, value) {
@@ -143,7 +163,7 @@
 
 
     // ========================================================
-    // 5. FORMAT CURRENCY
+    // 6. FORMAT CURRENCY
     // ========================================================
 
     function formatMoney(amount) {
@@ -154,25 +174,36 @@
 
 
     // ========================================================
-    // 6. LOAD HOUSEHOLD OVERVIEW
+    // 7. LOAD HOUSEHOLD OVERVIEW
     // ========================================================
 
     function loadHouseholdOverview() {
 
-        const preferences = window.MealMateStorage.getPreferences();
+        const preferences =
+            window.MealMateStorage.getPreferences();
+
 
         if (!preferences) {
 
-            updateText(householdSizeElement, "Not set");
+            updateText(
+                householdSizeElement,
+                "Not set"
+            );
 
             updateText(
                 householdBreakdownElement,
                 "Complete your questionnaire"
             );
 
-            updateText(dietaryPreferenceElement, "Not set");
+            updateText(
+                dietaryPreferenceElement,
+                "Not set"
+            );
 
-            updateText(preferredRetailerElement, "Not set");
+            updateText(
+                preferredRetailerElement,
+                "Not set"
+            );
 
             updateText(
                 shoppingLocationElement,
@@ -184,22 +215,22 @@
         }
 
 
-        const adults = Number(preferences.adultCount) || 0;
+        const adults =
+            Number(preferences.adultCount) || 0;
 
-        const children = Number(preferences.childCount) || 0;
+        const children =
+            Number(preferences.childCount) || 0;
 
         const totalMembers =
             adults + children;
 
 
-        // Household size.
         updateText(
             householdSizeElement,
             `${totalMembers} ${totalMembers === 1 ? "member" : "members"}`
         );
 
 
-        // Household breakdown.
         updateText(
             householdBreakdownElement,
             `${adults} ${adults === 1 ? "adult" : "adults"} and ` +
@@ -207,21 +238,18 @@
         );
 
 
-        // Dietary preference.
         updateText(
             dietaryPreferenceElement,
             preferences.diet || "Not specified"
         );
 
 
-        // Preferred retailer.
         updateText(
             preferredRetailerElement,
             preferences.retailer || "Not set"
         );
 
 
-        // Shopping location.
         updateText(
             shoppingLocationElement,
             preferences.shoppingLocation || "Location not set"
@@ -231,7 +259,97 @@
 
 
     // ========================================================
-    // 7. FIND THE ESTIMATED COST OF A MEAL PLAN
+    // 8. GET MEAL ENTRIES FROM DIFFERENT PLAN FORMATS
+    // ========================================================
+
+    function getMealEntries(plan) {
+
+        if (!plan || typeof plan !== "object") {
+            return [];
+        }
+
+
+        // Current backend response:
+        // plan.mealPlan = [{day, mealType, recipe, portions}]
+
+        if (Array.isArray(plan.mealPlan)) {
+            return plan.mealPlan;
+        }
+
+
+        // Support older plan formats.
+        if (Array.isArray(plan.meals)) {
+            return plan.meals;
+        }
+
+
+        const source =
+            plan.days ||
+            plan.weeklyPlan ||
+            plan.schedule;
+
+
+        if (Array.isArray(source)) {
+
+            const meals = [];
+
+            source.forEach(function (day) {
+
+                if (Array.isArray(day.meals)) {
+
+                    day.meals.forEach(function (meal) {
+
+                        meals.push({
+                            ...meal,
+                            day: meal.day || day.day || day.name
+                        });
+
+                    });
+
+                }
+
+            });
+
+            return meals;
+
+        }
+
+
+        if (source && typeof source === "object") {
+
+            const meals = [];
+
+            Object.entries(source).forEach(
+                function ([dayName, dayMeals]) {
+
+                    if (Array.isArray(dayMeals)) {
+
+                        dayMeals.forEach(function (meal) {
+
+                            meals.push({
+                                ...meal,
+                                day: meal.day || dayName
+                            });
+
+                        });
+
+                    }
+
+                }
+            );
+
+            return meals;
+
+        }
+
+
+        return [];
+
+    }
+
+
+    // ========================================================
+    // 9. GET ESTIMATED COST OF THE MEAL PLAN
     // ========================================================
 
     function getEstimatedPlanCost(plan) {
@@ -241,7 +359,6 @@
         }
 
 
-        // Check for a total estimated cost supplied by the backend.
         const possibleTotals = [
 
             plan.totalEstimatedCost,
@@ -270,39 +387,85 @@
                 Number.isFinite(Number(value)) &&
                 Number(value) >= 0
             ) {
+
                 return Number(value);
+
             }
 
         }
 
 
-        // Otherwise calculate the total from individually priced recipes.
-        const recipes = Array.isArray(plan.selectedRecipes)
-            ? plan.selectedRecipes
-            : [];
+        // Check individual meal costs.
+        const mealEntries = getMealEntries(plan);
 
 
-        if (recipes.length > 0) {
+        if (mealEntries.length > 0) {
 
             let total = 0;
 
-            for (const recipe of recipes) {
 
-                const cost = Number(recipe.estimatedCost);
+            for (const meal of mealEntries) {
+
+                const recipe = getRecipeFromMeal(meal);
+
+                const cost =
+                    meal.cost ??
+                    recipe.estimatedCost ??
+                    null;
+
+
+                if (
+                    cost === null ||
+                    cost === undefined ||
+                    cost === "" ||
+                    !Number.isFinite(Number(cost)) ||
+                    Number(cost) < 0
+                ) {
+
+                    // Do not pretend that missing prices are zero.
+                    return null;
+
+                }
+
+
+                total += Number(cost);
+
+            }
+
+
+            return total;
+
+        }
+
+
+        // Support older selected recipe plans.
+        if (Array.isArray(plan.selectedRecipes)) {
+
+            if (plan.selectedRecipes.length === 0) {
+                return null;
+            }
+
+
+            let total = 0;
+
+
+            for (const recipe of plan.selectedRecipes) {
 
                 if (
                     recipe.estimatedCost === null ||
                     recipe.estimatedCost === undefined ||
-                    recipe.estimatedCost === "" ||
-                    !Number.isFinite(cost) ||
-                    cost < 0
+                    !Number.isFinite(Number(recipe.estimatedCost))
                 ) {
+
                     return null;
+
                 }
 
-                total += cost;
+
+                total += Number(recipe.estimatedCost);
 
             }
+
 
             return total;
 
@@ -315,14 +478,16 @@
 
 
     // ========================================================
-    // 8. LOAD WEEKLY BUDGET INFORMATION
+    // 10. LOAD WEEKLY BUDGET INFORMATION
     // ========================================================
 
     function loadBudgetInformation() {
 
-        const preferences = window.MealMateStorage.getPreferences();
+        const preferences =
+            window.MealMateStorage.getPreferences();
 
-        const mealPlan = window.MealMateStorage.getMealPlan();
+        const mealPlan =
+            window.MealMateStorage.getMealPlan();
 
 
         if (!preferences) {
@@ -347,16 +512,19 @@
         }
 
 
-        const weeklyBudget = Number(preferences.weeklyBudget);
+        const weeklyBudget =
+            Number(preferences.weeklyBudget);
 
 
-        // Display weekly budget.
         if (
             !Number.isFinite(weeklyBudget) ||
             weeklyBudget <= 0
         ) {
 
-            updateText(weeklyBudgetElement, "Not set");
+            updateText(
+                weeklyBudgetElement,
+                "Not set"
+            );
 
         } else {
 
@@ -368,21 +536,30 @@
         }
 
 
-        // Get the estimated meal plan cost.
-        const estimatedSpend = getEstimatedPlanCost(mealPlan);
+        const estimatedSpend =
+            getEstimatedPlanCost(mealPlan);
 
 
         if (estimatedSpend === null) {
 
-            updateText(estimatedSpendElement, "Not available");
+            updateText(
+                estimatedSpendElement,
+                "Not available"
+            );
 
-            updateText(budgetRemainingElement, "Not available");
+            updateText(
+                budgetRemainingElement,
+                "Not available"
+            );
 
-            updateText(budgetPercentageElement, "—");
+            updateText(
+                budgetPercentageElement,
+                "—"
+            );
 
             updateText(
                 budgetProgressText,
-                "Cost estimates will appear when recipe price information is available."
+                "Recipe prices are currently unavailable. Your budget total cannot yet be calculated."
             );
 
             updateProgressBar(0);
@@ -403,9 +580,15 @@
             weeklyBudget <= 0
         ) {
 
-            updateText(budgetRemainingElement, "Not available");
+            updateText(
+                budgetRemainingElement,
+                "Not available"
+            );
 
-            updateText(budgetPercentageElement, "—");
+            updateText(
+                budgetPercentageElement,
+                "—"
+            );
 
             updateText(
                 budgetProgressText,
@@ -419,8 +602,8 @@
         }
 
 
-        // Calculate the remaining budget.
-        const remainingBudget = weeklyBudget - estimatedSpend;
+        const remainingBudget =
+            weeklyBudget - estimatedSpend;
 
 
         updateText(
@@ -429,10 +612,11 @@
         );
 
 
-        // Calculate the percentage of the budget used.
-        const percentage = (estimatedSpend / weeklyBudget) * 100;
+        const percentage =
+            (estimatedSpend / weeklyBudget) * 100;
 
-        const displayPercentage = Math.round(percentage);
+        const displayPercentage =
+            Math.round(percentage);
 
 
         updateText(
@@ -441,10 +625,11 @@
         );
 
 
-        updateProgressBar(Math.min(displayPercentage, 100));
+        updateProgressBar(
+            Math.min(displayPercentage, 100)
+        );
 
 
-        // Update the progress description.
         if (percentage > 100) {
 
             updateText(
@@ -474,7 +659,7 @@
 
 
     // ========================================================
-    // 9. UPDATE BUDGET PROGRESS BAR
+    // 11. UPDATE BUDGET PROGRESS BAR
     // ========================================================
 
     function updateProgressBar(percentage) {
@@ -483,13 +668,15 @@
             return;
         }
 
+
         const safePercentage = Math.max(
             0,
             Math.min(Number(percentage) || 0, 100)
         );
 
 
-        budgetProgressFill.style.width = `${safePercentage}%`;
+        budgetProgressFill.style.width =
+            `${safePercentage}%`;
 
 
         budgetProgressTrack.setAttribute(
@@ -498,10 +685,10 @@
         );
 
 
-        // Visually indicate when the budget is exceeded.
         if (safePercentage >= 100) {
 
-            budgetProgressFill.style.backgroundColor = "#c43d3d";
+            budgetProgressFill.style.backgroundColor =
+                "#c43d3d";
 
         } else {
 
@@ -513,7 +700,7 @@
 
 
     // ========================================================
-    // 10. DISPLAY THE CURRENT WEEK
+    // 12. DISPLAY CURRENT WEEK
     // ========================================================
 
     function displayCurrentWeek() {
@@ -522,13 +709,14 @@
             return;
         }
 
+
         const today = new Date();
 
         const dayOfWeek = today.getDay();
 
-        // JavaScript Sunday = 0.
-        // Convert the date to Monday.
-        const daysFromMonday = (dayOfWeek + 6) % 7;
+        const daysFromMonday =
+            (dayOfWeek + 6) % 7;
+
 
         const monday = new Date(today);
 
@@ -536,15 +724,21 @@
             today.getDate() - daysFromMonday
         );
 
+
         const sunday = new Date(monday);
 
-        sunday.setDate(monday.getDate() + 6);
+        sunday.setDate(
+            monday.getDate() + 6
+        );
 
 
-        const dateFormatter = new Intl.DateTimeFormat("en-ZA", {
-            day: "numeric",
-            month: "short"
-        });
+        const dateFormatter = new Intl.DateTimeFormat(
+            "en-ZA",
+            {
+                day: "numeric",
+                month: "short"
+            }
+        );
 
 
         updateText(
@@ -556,7 +750,115 @@
 
 
     // ========================================================
-    // 11. NORMALISE MEAL PLAN DATA
+    // 13. GET RECIPE OBJECT FROM A MEAL
+    // ========================================================
+
+    function getRecipeFromMeal(meal) {
+
+        if (!meal || typeof meal !== "object") {
+            return {};
+        }
+
+
+        // The current backend nests recipe details here.
+        if (
+            meal.recipe &&
+            typeof meal.recipe === "object"
+        ) {
+
+            return meal.recipe;
+
+        }
+
+
+        // Support older formats where recipe fields
+        // were returned directly on the meal object.
+        return meal;
+
+    }
+
+
+    // ========================================================
+    // 14. NORMALISE A FLAT WEEKLY MEAL PLAN
+    // ========================================================
+
+    function groupMealsByDay(meals) {
+
+        const groupedMeals = new Map();
+
+
+        meals.forEach(function (meal) {
+
+            if (!meal || typeof meal !== "object") {
+                return;
+            }
+
+
+            const dayName =
+                meal.day ||
+                meal.dayName ||
+                "Unscheduled";
+
+
+            if (!groupedMeals.has(dayName)) {
+
+                groupedMeals.set(
+                    dayName,
+                    []
+                );
+
+            }
+
+
+            groupedMeals.get(dayName).push(meal);
+
+        });
+
+
+        const orderedDays = Array.from(
+            groupedMeals.entries()
+        ).sort(function (first, second) {
+
+            const firstIndex =
+                DAYS_OF_WEEK.indexOf(first[0]);
+
+            const secondIndex =
+                DAYS_OF_WEEK.indexOf(second[0]);
+
+
+            if (firstIndex === -1 && secondIndex === -1) {
+                return 0;
+            }
+
+            if (firstIndex === -1) {
+                return 1;
+            }
+
+            if (secondIndex === -1) {
+                return -1;
+            }
+
+            return firstIndex - secondIndex;
+
+        });
+
+
+        return orderedDays.map(
+            function ([name, dayMeals]) {
+
+                return {
+                    name,
+                    meals: dayMeals
+                };
+
+            }
+        );
+
+    }
+
+
+    // ========================================================
+    // 15. NORMALISE MEAL PLAN DATA
     // ========================================================
 
     function getPlanDays(plan) {
@@ -565,11 +867,61 @@
             return [];
         }
 
-        const source = plan.days || plan.weeklyPlan || plan.schedule;
+
+        // CURRENT BACKEND FORMAT:
+        //
+        // mealPlan: [
+        //   {
+        //     day: "Monday",
+        //     mealType: "Dinner",
+        //     recipe: {...},
+        //     portions: {...}
+        //   }
+        // ]
+
+        if (Array.isArray(plan.mealPlan)) {
+
+            return groupMealsByDay(
+                plan.mealPlan
+            );
+
+        }
 
 
-        // The backend may provide days as an array.
+        // Support flat meal arrays.
+        if (Array.isArray(plan.meals)) {
+
+            return groupMealsByDay(
+                plan.meals
+            );
+
+        }
+
+
+        const source =
+            plan.days ||
+            plan.weeklyPlan ||
+            plan.schedule;
+
+
+        // Support day arrays.
         if (Array.isArray(source)) {
+
+            // Some older plans store meal entries directly
+            // rather than wrapping them in day objects.
+            if (
+                source.length > 0 &&
+                !Array.isArray(source[0].meals) &&
+                (
+                    source[0].recipe ||
+                    source[0].mealType
+                )
+            ) {
+
+                return groupMealsByDay(source);
+
+            }
+
 
             return source.map(function (day, index) {
 
@@ -592,50 +944,23 @@
         }
 
 
-        // Or it may provide an object with weekday names as keys.
-        if (source && typeof source === "object") {
+        // Support object-based weekday schedules.
+        if (
+            source &&
+            typeof source === "object"
+        ) {
 
-            return Object.entries(source).map(function ([day, meals]) {
-
-                return {
-
-                    name: day,
-
-                    meals: Array.isArray(meals)
-                        ? meals
-                        : []
-
-                };
-
-            });
-
-        }
-
-
-        // Support plans that have a meals array with day properties.
-        if (Array.isArray(plan.meals)) {
-
-            const groupedMeals = new Map();
-
-            plan.meals.forEach(function (meal) {
-
-                const day = meal.day || meal.dayName || "Unscheduled";
-
-                if (!groupedMeals.has(day)) {
-                    groupedMeals.set(day, []);
-                }
-
-                groupedMeals.get(day).push(meal);
-
-            });
-
-
-            return Array.from(groupedMeals.entries()).map(
+            return Object.entries(source).map(
                 function ([day, meals]) {
 
                     return {
+
                         name: day,
-                        meals: meals
+
+                        meals: Array.isArray(meals)
+                            ? meals
+                            : []
+
                     };
 
                 }
@@ -650,53 +975,550 @@
 
 
     // ========================================================
-    // 12. CREATE A MEAL ENTRY
+    // 16. VALIDATE RECIPE IMAGE URLS
+    // ========================================================
+
+    function getSafeImageURL(imageURL) {
+
+        if (
+            typeof imageURL !== "string" ||
+            !imageURL.trim()
+        ) {
+
+            return null;
+
+        }
+
+
+        try {
+
+            const parsedURL = new URL(
+                imageURL,
+                window.location.href
+            );
+
+
+            if (
+                parsedURL.protocol !== "https:" &&
+                parsedURL.protocol !== "http:"
+            ) {
+
+                return null;
+
+            }
+
+
+            return parsedURL.href;
+
+        } catch (error) {
+
+            return null;
+
+        }
+
+    }
+
+
+    // ========================================================
+    // 17. CREATE RECIPE PHOTOGRAPH
+    // ========================================================
+
+    function createRecipeImage(recipe) {
+
+        const image = document.createElement("img");
+
+        image.className = "meal-entry-image";
+
+        image.alt =
+            `Photograph of ${recipe.name || "this recipe"}`;
+
+
+        image.loading = "lazy";
+
+        image.decoding = "async";
+
+        image.style.display = "block";
+
+        image.style.width = "100%";
+
+        image.style.height = "190px";
+
+        image.style.objectFit = "cover";
+
+        image.style.objectPosition = "center";
+
+        image.style.borderRadius = "10px";
+
+
+        // Use the actual photograph supplied by TheMealDB.
+        const imageURL = getSafeImageURL(
+            recipe.image ||
+            recipe.thumbnail ||
+            recipe.imageUrl
+        );
+
+
+        if (imageURL) {
+
+            image.src = imageURL;
+
+        } else {
+
+            image.dataset.usingFallback = "true";
+
+            image.src = RECIPE_PLACEHOLDER;
+
+        }
+
+
+        // If the original photograph cannot load,
+        // display the application's local placeholder.
+        image.addEventListener("error", function () {
+
+            if (image.dataset.usingFallback !== "true") {
+
+                image.dataset.usingFallback = "true";
+
+                image.src = RECIPE_PLACEHOLDER;
+
+                return;
+
+            }
+
+
+            // Avoid endlessly retrying a missing placeholder.
+            image.hidden = true;
+
+        });
+
+
+        return image;
+
+    }
+
+
+    // ========================================================
+    // 18. FORMAT RECIPE INGREDIENTS
+    // ========================================================
+
+    function getIngredientText(ingredient) {
+
+        if (typeof ingredient === "string") {
+
+            return ingredient;
+
+        }
+
+
+        if (
+            !ingredient ||
+            typeof ingredient !== "object"
+        ) {
+
+            return "";
+
+        }
+
+
+        const name =
+            ingredient.name ||
+            ingredient.ingredient ||
+            ingredient.item ||
+            "";
+
+
+        const measure =
+            ingredient.measure ||
+            ingredient.quantity ||
+            "";
+
+
+        return [
+            measure,
+            name
+        ].filter(Boolean).join(" ");
+
+    }
+
+
+    // ========================================================
+    // 19. CREATE INGREDIENT DETAILS
+    // ========================================================
+
+    function createIngredientDetails(ingredients) {
+
+        if (
+            !Array.isArray(ingredients) ||
+            ingredients.length === 0
+        ) {
+
+            return null;
+
+        }
+
+
+        const details = document.createElement("details");
+
+        details.className = "meal-entry-details";
+
+
+        const summary = document.createElement("summary");
+
+        summary.textContent =
+            `View ingredients (${ingredients.length})`;
+
+
+        const list = document.createElement("ul");
+
+
+        ingredients.forEach(function (ingredient) {
+
+            const ingredientText =
+                getIngredientText(ingredient);
+
+
+            if (!ingredientText) {
+                return;
+            }
+
+
+            const item = document.createElement("li");
+
+            item.textContent = ingredientText;
+
+            list.appendChild(item);
+
+        });
+
+
+        details.append(summary, list);
+
+        return details;
+
+    }
+
+
+    // ========================================================
+    // 20. CREATE COOKING INSTRUCTIONS
+    // ========================================================
+
+    function createInstructionDetails(recipe) {
+
+        if (
+            typeof recipe.instructions !== "string" ||
+            !recipe.instructions.trim()
+        ) {
+
+            return null;
+
+        }
+
+
+        const details = document.createElement("details");
+
+        details.className = "meal-entry-details";
+
+
+        const summary = document.createElement("summary");
+
+        summary.textContent = "Cooking instructions";
+
+
+        const instructions = document.createElement("p");
+
+        instructions.textContent =
+            recipe.instructions.trim();
+
+
+        details.append(summary, instructions);
+
+        return details;
+
+    }
+
+
+    // ========================================================
+    // 21. CREATE A MEAL ENTRY WITH A REAL RECIPE IMAGE
     // ========================================================
 
     function createMealEntry(meal) {
 
-        const entry = document.createElement("div");
+        const recipe =
+            getRecipeFromMeal(meal);
 
-        entry.className = "meal-entry";
 
+        const entry = document.createElement("article");
+
+        entry.className = "meal-entry meal-recipe-card";
+
+        entry.style.overflow = "hidden";
+
+
+        // ----------------------------------------------------
+        // A. RECIPE IMAGE
+        // ----------------------------------------------------
+
+        const image = createRecipeImage(recipe);
+
+        entry.appendChild(image);
+
+
+        // ----------------------------------------------------
+        // B. RECIPE CONTENT
+        // ----------------------------------------------------
+
+        const content = document.createElement("div");
+
+        content.className = "meal-entry-content";
+
+        content.style.paddingTop = "12px";
+
+
+        // ----------------------------------------------------
+        // C. RECIPE NAME
+        // ----------------------------------------------------
 
         const title = document.createElement("h4");
 
         title.textContent =
-            meal.name ||
+            recipe.name ||
             meal.recipeName ||
+            meal.name ||
             meal.title ||
-            "Untitled meal";
+            "Untitled recipe";
 
+
+        content.appendChild(title);
+
+
+        // ----------------------------------------------------
+        // D. MEAL CATEGORY AND AVAILABLE DETAILS
+        // ----------------------------------------------------
 
         const details = document.createElement("p");
 
-        const category = meal.category || meal.type || "Meal";
+        details.className = "meal-entry-meta";
 
-        const time = meal.totalTime ?? meal.cookingTime;
 
-        let detailText = category;
+        const mealType =
+            meal.mealType ||
+            meal.type ||
+            recipe.mealType ||
+            "Meal";
+
+
+        const category =
+            recipe.category ||
+            meal.category ||
+            "";
+
+
+        const detailParts = [mealType];
+
+
+        if (
+            category &&
+            category.toLowerCase() !== mealType.toLowerCase()
+        ) {
+
+            detailParts.push(category);
+
+        }
+
+
+        const time =
+            recipe.totalTime ??
+            meal.totalTime ??
+            recipe.cookingTime ??
+            meal.cookingTime;
+
 
         if (
             time !== undefined &&
             time !== null &&
             Number.isFinite(Number(time))
         ) {
-            detailText += ` · ${time} minutes`;
+
+            detailParts.push(
+                `${Number(time)} minutes`
+            );
+
         }
+
+
+        details.textContent =
+            detailParts.join(" · ");
+
+
+        content.appendChild(details);
+
+
+        // ----------------------------------------------------
+        // E. RECIPE DESCRIPTION
+        // ----------------------------------------------------
 
         if (
-            meal.estimatedCost !== undefined &&
-            meal.estimatedCost !== null &&
-            Number.isFinite(Number(meal.estimatedCost))
+            typeof recipe.description === "string" &&
+            recipe.description.trim()
         ) {
-            detailText += ` · ${formatMoney(Number(meal.estimatedCost))}`;
+
+            const description =
+                document.createElement("p");
+
+            description.className =
+                "meal-entry-description";
+
+            description.textContent =
+                recipe.description.trim();
+
+            content.appendChild(description);
+
         }
 
 
-        details.textContent = detailText;
+        // ----------------------------------------------------
+        // F. HOUSEHOLD PORTION INFORMATION
+        // ----------------------------------------------------
 
-        entry.append(title, details);
+        const portions =
+            meal.portions ||
+            meal.householdPortions ||
+            null;
+
+
+        if (
+            portions &&
+            Number.isFinite(
+                Number(portions.totalHouseholdServings)
+            )
+        ) {
+
+            const portionText =
+                document.createElement("p");
+
+            portionText.className =
+                "meal-entry-portions";
+
+            portionText.textContent =
+                `Household servings: ${portions.totalHouseholdServings}`;
+
+
+            content.appendChild(portionText);
+
+        }
+
+
+        // ----------------------------------------------------
+        // G. RECIPE COST
+        // ----------------------------------------------------
+
+        const costValue =
+            meal.cost ??
+            recipe.estimatedCost ??
+            null;
+
+
+        const costText =
+            document.createElement("p");
+
+        costText.className = "meal-entry-cost";
+
+
+        if (
+            costValue !== null &&
+            costValue !== undefined &&
+            costValue !== "" &&
+            Number.isFinite(Number(costValue))
+        ) {
+
+            costText.textContent =
+                formatMoney(Number(costValue));
+
+        } else {
+
+            costText.textContent =
+                "Price currently unavailable";
+
+        }
+
+
+        content.appendChild(costText);
+
+
+        // ----------------------------------------------------
+        // H. INGREDIENTS
+        // ----------------------------------------------------
+
+        const ingredients =
+            Array.isArray(recipe.ingredients)
+                ? recipe.ingredients
+                : Array.isArray(meal.ingredients)
+                    ? meal.ingredients
+                    : [];
+
+
+        const ingredientDetails =
+            createIngredientDetails(ingredients);
+
+
+        if (ingredientDetails) {
+
+            content.appendChild(ingredientDetails);
+
+        }
+
+
+        // ----------------------------------------------------
+        // I. COOKING INSTRUCTIONS
+        // ----------------------------------------------------
+
+        const instructionDetails =
+            createInstructionDetails(recipe);
+
+
+        if (instructionDetails) {
+
+            content.appendChild(instructionDetails);
+
+        }
+
+
+        // ----------------------------------------------------
+        // J. SOURCE LINK
+        // ----------------------------------------------------
+
+        const sourceURL = getSafeImageURL(
+            recipe.sourceUrl ||
+            recipe.sourceURL ||
+            meal.sourceUrl
+        );
+
+
+        if (sourceURL) {
+
+            const sourceLink =
+                document.createElement("a");
+
+            sourceLink.href = sourceURL;
+
+            sourceLink.target = "_blank";
+
+            sourceLink.rel =
+                "noopener noreferrer";
+
+            sourceLink.textContent =
+                "View original recipe";
+
+            sourceLink.className =
+                "meal-entry-source";
+
+
+            content.appendChild(sourceLink);
+
+        }
+
+
+        entry.appendChild(content);
 
         return entry;
 
@@ -704,7 +1526,7 @@
 
 
     // ========================================================
-    // 13. CREATE A DAY CARD
+    // 22. CREATE A DAY CARD
     // ========================================================
 
     function createDayCard(day) {
@@ -714,7 +1536,8 @@
         card.className = "meal-day-card";
 
 
-        const heading = document.createElement("h3");
+        const heading =
+            document.createElement("h3");
 
         heading.textContent = day.name;
 
@@ -722,11 +1545,16 @@
         card.appendChild(heading);
 
 
-        if (!day.meals || day.meals.length === 0) {
+        if (
+            !Array.isArray(day.meals) ||
+            day.meals.length === 0
+        ) {
 
-            const emptyText = document.createElement("p");
+            const emptyText =
+                document.createElement("p");
 
-            emptyText.textContent = "No meals added for this day.";
+            emptyText.textContent =
+                "No meals added for this day.";
 
             card.appendChild(emptyText);
 
@@ -750,14 +1578,15 @@
 
 
     // ========================================================
-    // 14. DISPLAY SELECTED RECIPES WITHOUT DAY ASSIGNMENTS
+    // 23. DISPLAY SELECTED RECIPES WITHOUT DAY ASSIGNMENTS
     // ========================================================
 
     function displaySelectedRecipes(plan) {
 
-        const selectedRecipes = Array.isArray(plan.selectedRecipes)
-            ? plan.selectedRecipes
-            : [];
+        const selectedRecipes =
+            Array.isArray(plan.selectedRecipes)
+                ? plan.selectedRecipes
+                : [];
 
 
         if (selectedRecipes.length === 0) {
@@ -770,16 +1599,18 @@
         card.className = "meal-day-card";
 
 
-        const heading = document.createElement("h3");
+        const heading =
+            document.createElement("h3");
 
-        heading.textContent = "Meals you've selected";
+        heading.textContent =
+            "Meals you've selected";
 
 
-        const description = document.createElement("p");
+        const description =
+            document.createElement("p");
 
         description.textContent =
-            "These recipes have been added to your meal plan. " +
-            "They have not yet been assigned to specific days.";
+            "These recipes have been added to your meal plan.";
 
 
         card.append(heading, description);
@@ -802,12 +1633,37 @@
 
 
     // ========================================================
-    // 15. LOAD AND DISPLAY THE WEEKLY MEAL PLAN
+    // 24. UPDATE EMPTY STATE MESSAGE
+    // ========================================================
+
+    function updateEmptyStateMessage(message) {
+
+        if (!dashboardEmptyState) {
+            return;
+        }
+
+
+        const paragraph =
+            dashboardEmptyState.querySelector("p");
+
+
+        if (paragraph && message) {
+
+            paragraph.textContent = message;
+
+        }
+
+    }
+
+
+    // ========================================================
+    // 25. LOAD AND DISPLAY THE WEEKLY MEAL PLAN
     // ========================================================
 
     function loadWeeklyMealPlan() {
 
-        const plan = window.MealMateStorage.getMealPlan();
+        const plan =
+            window.MealMateStorage.getMealPlan();
 
 
         mealPlanContainer.replaceChildren();
@@ -815,7 +1671,14 @@
 
         if (!plan) {
 
-            dashboardEmptyState.classList.remove("hidden");
+            updateEmptyStateMessage(
+                "Complete your household questionnaire and generate your first personalised weekly meal plan."
+            );
+
+
+            if (dashboardEmptyState) {
+                dashboardEmptyState.classList.remove("hidden");
+            }
 
             return;
 
@@ -827,36 +1690,53 @@
         let hasMeals = false;
 
 
-        // Display daily meal cards when available.
+        // Display meals grouped by their scheduled day.
         if (days.length > 0) {
 
             days.forEach(function (day) {
 
+                if (
+                    Array.isArray(day.meals) &&
+                    day.meals.length > 0
+                ) {
+
+                    hasMeals = true;
+
+                }
+
+
                 mealPlanContainer.appendChild(
                     createDayCard(day)
                 );
-
-                if (day.meals.length > 0) {
-                    hasMeals = true;
-                }
 
             });
 
         }
 
 
-        // If recipes have only been selected but not scheduled,
-        // display them without pretending that they have assigned days.
+        // Support recipes selected outside the weekly schedule.
         if (!hasMeals) {
 
             mealPlanContainer.replaceChildren();
 
+
             const displayedSelectedRecipes =
                 displaySelectedRecipes(plan);
 
+
             if (!displayedSelectedRecipes) {
 
-                dashboardEmptyState.classList.remove("hidden");
+                const message =
+                    plan.message ||
+                    "No meal recommendations are available yet. Try generating a new meal plan or adjusting your preferences.";
+
+
+                updateEmptyStateMessage(message);
+
+
+                if (dashboardEmptyState) {
+                    dashboardEmptyState.classList.remove("hidden");
+                }
 
                 return;
 
@@ -865,39 +1745,53 @@
         }
 
 
-        dashboardEmptyState.classList.add("hidden");
+        if (dashboardEmptyState) {
+            dashboardEmptyState.classList.add("hidden");
+        }
 
     }
 
 
     // ========================================================
-    // 16. CREATE A DASHBOARD MESSAGE
+    // 26. CREATE A DASHBOARD MESSAGE
     // ========================================================
 
-    function showDashboardMessage(message, type = "success") {
+    function showDashboardMessage(
+        message,
+        type = "success"
+    ) {
 
-        let messageElement = document.getElementById(
-            "dashboardPlanMessage"
-        );
+        let messageElement =
+            document.getElementById("dashboardPlanMessage");
 
 
-        // Create the message element when it doesn't exist.
         if (!messageElement) {
 
-            messageElement = document.createElement("div");
+            messageElement =
+                document.createElement("div");
 
-            messageElement.id = "dashboardPlanMessage";
+            messageElement.id =
+                "dashboardPlanMessage";
 
-            messageElement.className = "form-message";
+            messageElement.className =
+                "form-message";
 
-            messageElement.setAttribute("role", "status");
+            messageElement.setAttribute(
+                "role",
+                "status"
+            );
 
-            messageElement.setAttribute("aria-live", "polite");
+            messageElement.setAttribute(
+                "aria-live",
+                "polite"
+            );
 
 
             if (mealPlanContainer) {
 
-                mealPlanContainer.before(messageElement);
+                mealPlanContainer.before(
+                    messageElement
+                );
 
             }
 
@@ -906,99 +1800,157 @@
 
         messageElement.textContent = message;
 
+
         messageElement.classList.remove(
             "hidden",
             "success-message",
-            "error-message"
+            "error-message",
+            "warning-note"
         );
 
-        messageElement.classList.add(
-            type === "error"
-                ? "error-message"
-                : "success-message"
-        );
 
-        messageElement.setAttribute(
-            "role",
-            type === "error" ? "alert" : "status"
-        );
+        if (type === "error") {
+
+            messageElement.classList.add(
+                "error-message"
+            );
+
+            messageElement.setAttribute(
+                "role",
+                "alert"
+            );
+
+        } else if (type === "warning") {
+
+            messageElement.classList.add(
+                "warning-note"
+            );
+
+            messageElement.setAttribute(
+                "role",
+                "status"
+            );
+
+        } else {
+
+            messageElement.classList.add(
+                "success-message"
+            );
+
+            messageElement.setAttribute(
+                "role",
+                "status"
+            );
+
+        }
 
     }
 
 
     // ========================================================
-    // 17. EXTRACT GENERATED MEAL PLAN FROM API RESPONSE
+    // 27. EXTRACT GENERATED MEAL PLAN FROM API RESPONSE
     // ========================================================
 
     function extractGeneratedPlan(response) {
 
-        if (!response || typeof response !== "object") {
+        if (
+            !response ||
+            typeof response !== "object"
+        ) {
+
             return null;
+
         }
 
-        let plan =
-            response.mealPlan ||
-            response.plan ||
-            response.data?.mealPlan ||
-            response.data?.plan ||
-            response.data ||
-            response;
+
+        if (response.success === false) {
+
+            throw new Error(
+                response.message ||
+                "The backend could not generate a meal plan."
+            );
+
+        }
 
 
-        // Convert an array of daily plans into a plan object.
+        let plan = response;
+
+
+        // Support APIs that wrap their response in data.
+        if (
+            response.data &&
+            typeof response.data === "object"
+        ) {
+
+            plan = response.data;
+
+        }
+
+
+        // Current backend response:
+        // {
+        //   success: true,
+        //   message: "...",
+        //   mealPlan: [...]
+        // }
+        //
+        // An empty mealPlan is also a valid response
+        // when no suitable recipes are found.
+
+        if (Array.isArray(plan.mealPlan)) {
+
+            return plan;
+
+        }
+
+
+        // Support direct plan responses.
         if (Array.isArray(plan)) {
 
-            plan = {
-                days: plan
+            return {
+                mealPlan: plan
             };
 
         }
 
 
-        if (!plan || typeof plan !== "object") {
-            return null;
+        if (Array.isArray(plan.selectedRecipes)) {
+
+            return plan;
+
         }
 
 
-        // Check that the response contains actual meal information.
-        const hasSelectedRecipes =
-            Array.isArray(plan.selectedRecipes) &&
-            plan.selectedRecipes.length > 0;
-
-        const hasDays =
+        if (
             Array.isArray(plan.days) ||
-            (
-                plan.days &&
-                typeof plan.days === "object"
-            ) ||
             Array.isArray(plan.weeklyPlan) ||
             Array.isArray(plan.meals) ||
             (
                 plan.schedule &&
                 typeof plan.schedule === "object"
-            );
+            )
+        ) {
 
+            return plan;
 
-        if (!hasSelectedRecipes && !hasDays) {
-            return null;
         }
 
 
-        return plan;
+        return null;
 
     }
 
 
     // ========================================================
-    // 18. GENERATE A PERSONALISE​D MEAL PLAN
+    // 28. GENERATE A PERSONALISED MEAL PLAN
     // ========================================================
 
     async function handleGenerateMealPlan() {
 
-        const preferences = window.MealMateStorage.getPreferences();
+        const preferences =
+            window.MealMateStorage.getPreferences();
 
 
-        // A questionnaire must be completed first.
         if (!preferences) {
 
             showDashboardMessage(
@@ -1023,6 +1975,11 @@
         }
 
 
+        if (!generateMealPlanButton) {
+            return;
+        }
+
+
         const originalButtonText =
             generateMealPlanButton.textContent;
 
@@ -1030,32 +1987,37 @@
         generateMealPlanButton.disabled = true;
 
         generateMealPlanButton.textContent =
-            "Generating your meal plan...";
+            "Fetching recipes and building your meal plan...";
 
 
         try {
 
+            // Send household preferences to the backend.
             const response =
-                await window.MealMateAPI.generateMealPlan(preferences);
+                await window.MealMateAPI.generateMealPlan(
+                    preferences
+                );
 
 
-            const generatedPlan = extractGeneratedPlan(response);
+            // Extract the actual meal plan.
+            const generatedPlan =
+                extractGeneratedPlan(response);
 
 
             if (!generatedPlan) {
 
                 throw new Error(
-                    "The backend returned an invalid meal plan. " +
-                    "Please try again."
+                    "The backend returned an invalid meal plan. Please try again."
                 );
 
             }
 
 
-            // Preserve recipes the user previously selected
-            // if the backend did not return selectedRecipes.
+            // Preserve existing selected recipes when the
+            // backend does not provide a selectedRecipes array.
             const existingPlan =
                 window.MealMateStorage.getMealPlan();
+
 
             if (
                 existingPlan &&
@@ -1069,12 +2031,15 @@
             }
 
 
-            generatedPlan.generatedAt = new Date().toISOString();
+            generatedPlan.generatedAt =
+                new Date().toISOString();
 
 
-            const saved = window.MealMateStorage.saveMealPlan(
-                generatedPlan
-            );
+            // Save the generated plan.
+            const saved =
+                window.MealMateStorage.saveMealPlan(
+                    generatedPlan
+                );
 
 
             if (!saved) {
@@ -1086,12 +2051,14 @@
             }
 
 
+            // Record user activity.
             window.MealMateStorage.addActivity(
                 "A new weekly meal plan was generated",
                 "meal-plan"
             );
 
 
+            // Refresh dashboard sections.
             loadWeeklyMealPlan();
 
             loadBudgetInformation();
@@ -1099,15 +2066,35 @@
             loadRecentActivity();
 
 
-            showDashboardMessage(
-                "Your personalised meal plan has been generated successfully!",
-                "success"
-            );
+            // Display different messages for empty and successful plans.
+            const generatedMeals =
+                getMealEntries(generatedPlan);
+
+
+            if (generatedMeals.length === 0) {
+
+                showDashboardMessage(
+                    generatedPlan.message ||
+                    "No suitable recipes were found. Try adjusting your household preferences.",
+                    "warning"
+                );
+
+            } else {
+
+                showDashboardMessage(
+                    `Your personalised meal plan is ready! ${generatedMeals.length} meal recommendations were added.`,
+                    "success"
+                );
+
+            }
 
 
         } catch (error) {
 
-            console.error("Meal plan generation failed:", error);
+            console.error(
+                "Meal plan generation failed:",
+                error
+            );
 
 
             showDashboardMessage(
@@ -1129,7 +2116,7 @@
 
 
     // ========================================================
-    // 19. LOAD RECENT ACTIVITIES
+    // 29. LOAD RECENT ACTIVITIES
     // ========================================================
 
     function loadRecentActivity() {
@@ -1139,7 +2126,8 @@
         }
 
 
-        const activities = window.MealMateStorage.getActivities();
+        const activities =
+            window.MealMateStorage.getActivities();
 
 
         recentActivityElement.replaceChildren();
@@ -1147,19 +2135,26 @@
 
         if (activities.length === 0) {
 
-            const empty = document.createElement("div");
+            const empty =
+                document.createElement("div");
 
-            empty.className = "activity-empty";
+            empty.className =
+                "activity-empty";
 
 
-            const icon = document.createElement("span");
+            const icon =
+                document.createElement("span");
 
-            icon.setAttribute("aria-hidden", "true");
+            icon.setAttribute(
+                "aria-hidden",
+                "true"
+            );
 
             icon.textContent = "📝";
 
 
-            const paragraph = document.createElement("p");
+            const paragraph =
+                document.createElement("p");
 
             paragraph.textContent =
                 "Your recent meal-planning activities will appear here.";
@@ -1176,30 +2171,43 @@
 
         activities.forEach(function (activity) {
 
-            const item = document.createElement("div");
+            const item =
+                document.createElement("div");
 
-            item.className = "activity-item";
-
-
-            const icon = document.createElement("span");
-
-            icon.setAttribute("aria-hidden", "true");
-
-            icon.textContent = getActivityIcon(activity.type);
+            item.className =
+                "activity-item";
 
 
-            const content = document.createElement("div");
+            const icon =
+                document.createElement("span");
+
+            icon.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            icon.textContent =
+                getActivityIcon(activity.type);
 
 
-            const message = document.createElement("p");
+            const content =
+                document.createElement("div");
 
-            message.textContent = activity.message;
+
+            const message =
+                document.createElement("p");
+
+            message.textContent =
+                activity.message;
 
 
-            const date = document.createElement("small");
+            const date =
+                document.createElement("small");
 
             date.textContent =
-                window.MealMateApp.formatDate(activity.createdAt);
+                window.MealMateApp.formatDate(
+                    activity.createdAt
+                );
 
 
             content.append(message, date);
@@ -1214,7 +2222,7 @@
 
 
     // ========================================================
-    // 20. ACTIVITY ICONS
+    // 30. ACTIVITY ICONS
     // ========================================================
 
     function getActivityIcon(type) {
@@ -1235,13 +2243,14 @@
 
         };
 
+
         return icons[type] || "📝";
 
     }
 
 
     // ========================================================
-    // 21. REFRESH DASHBOARD DATA
+    // 31. REFRESH DASHBOARD DATA
     // ========================================================
 
     function refreshDashboard() {
@@ -1258,20 +2267,23 @@
 
 
     // ========================================================
-    // 22. INITIALIZE
+    // 32. INITIALIZE
     // ========================================================
 
     initializeDashboard();
 
 
-    // Refresh dashboard when the browser tab becomes active again.
-    document.addEventListener("visibilitychange", function () {
+    // Refresh dashboard when the browser tab becomes active.
+    document.addEventListener(
+        "visibilitychange",
+        function () {
 
-        if (!document.hidden) {
-            refreshDashboard();
+            if (!document.hidden) {
+                refreshDashboard();
+            }
+
         }
-
-    });
+    );
 
 
 })();

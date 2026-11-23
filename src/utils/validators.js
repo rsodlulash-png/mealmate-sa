@@ -1,3 +1,4 @@
+
 // ============================================================
 // MEALMATE SA
 // Backend Input Validation
@@ -100,9 +101,7 @@ class ValidationError extends Error {
         super(message);
 
         this.name = "ValidationError";
-
         this.status = 400;
-
         this.errors = errors;
 
     }
@@ -114,16 +113,33 @@ class ValidationError extends Error {
 // 3. GENERAL VALIDATION HELPERS
 // ============================================================
 
+// ------------------------------------------------------------
+// 3.1 CHECK WHETHER A VALUE IS A PLAIN OBJECT
+// ------------------------------------------------------------
+
 function isPlainObject(value) {
 
+    if (
+        value === null ||
+        typeof value !== "object" ||
+        Array.isArray(value)
+    ) {
+        return false;
+    }
+
+    const prototype = Object.getPrototypeOf(value);
+
     return (
-        value !== null &&
-        typeof value === "object" &&
-        !Array.isArray(value)
+        prototype === Object.prototype ||
+        prototype === null
     );
 
 }
 
+
+// ------------------------------------------------------------
+// 3.2 VALIDATE OBJECT
+// ------------------------------------------------------------
 
 function validateObject(value, fieldName = "Input") {
 
@@ -139,6 +155,10 @@ function validateObject(value, fieldName = "Input") {
 
 }
 
+
+// ------------------------------------------------------------
+// 3.3 VALIDATE STRING
+// ------------------------------------------------------------
 
 function validateString(
     value,
@@ -160,7 +180,11 @@ function validateString(
     ) {
 
         if (required) {
-            throw new ValidationError(`${fieldName} is required.`);
+
+            throw new ValidationError(
+                `${fieldName} is required.`
+            );
+
         }
 
         return "";
@@ -185,7 +209,10 @@ function validateString(
     }
 
 
-    if (required && cleanedValue.length < minLength) {
+    if (
+        required &&
+        cleanedValue.length < minLength
+    ) {
 
         throw new ValidationError(
             `${fieldName} must contain at least ${minLength} characters.`
@@ -203,7 +230,10 @@ function validateString(
     }
 
 
-    if (pattern && !pattern.test(cleanedValue)) {
+    if (
+        pattern &&
+        !pattern.test(cleanedValue)
+    ) {
 
         throw new ValidationError(
             `${fieldName} contains invalid characters.`
@@ -216,6 +246,10 @@ function validateString(
 
 }
 
+
+// ------------------------------------------------------------
+// 3.4 VALIDATE NUMBER
+// ------------------------------------------------------------
 
 function validateNumber(
     value,
@@ -230,14 +264,10 @@ function validateNumber(
     } = options;
 
 
-    const number = Number(value);
-
-
+    // Only actual numbers and numeric strings are accepted.
     if (
-        value === "" ||
-        value === null ||
-        value === undefined ||
-        !Number.isFinite(number)
+        typeof value !== "number" &&
+        typeof value !== "string"
     ) {
 
         throw new ValidationError(
@@ -247,7 +277,34 @@ function validateNumber(
     }
 
 
-    if (integer && !Number.isInteger(number)) {
+    if (
+        value === "" ||
+        value.trim?.() === ""
+    ) {
+
+        throw new ValidationError(
+            `${fieldName} must be a valid number.`
+        );
+
+    }
+
+
+    const number = Number(value);
+
+
+    if (!Number.isFinite(number)) {
+
+        throw new ValidationError(
+            `${fieldName} must be a valid number.`
+        );
+
+    }
+
+
+    if (
+        integer &&
+        !Number.isInteger(number)
+    ) {
 
         throw new ValidationError(
             `${fieldName} must be a whole number.`
@@ -256,7 +313,10 @@ function validateNumber(
     }
 
 
-    if (number < min || number > max) {
+    if (
+        number < min ||
+        number > max
+    ) {
 
         throw new ValidationError(
             `${fieldName} must be between ${min} and ${max}.`
@@ -270,7 +330,15 @@ function validateNumber(
 }
 
 
-function validateEnum(value, allowedValues, fieldName) {
+// ------------------------------------------------------------
+// 3.5 VALIDATE ENUM
+// ------------------------------------------------------------
+
+function validateEnum(
+    value,
+    allowedValues,
+    fieldName
+) {
 
     if (
         typeof value !== "string" ||
@@ -289,6 +357,10 @@ function validateEnum(value, allowedValues, fieldName) {
 }
 
 
+// ------------------------------------------------------------
+// 3.6 VALIDATE STRING ARRAY
+// ------------------------------------------------------------
+
 function validateStringArray(
     value,
     fieldName,
@@ -303,7 +375,10 @@ function validateStringArray(
     } = options;
 
 
-    if (value === undefined || value === null) {
+    if (
+        value === undefined ||
+        value === null
+    ) {
 
         if (required) {
 
@@ -379,7 +454,7 @@ function validateStringArray(
     });
 
 
-    // Remove duplicate values.
+    // Remove duplicates while preserving their original order.
     return [...new Set(cleanedValues)];
 
 }
@@ -409,7 +484,10 @@ function validateWeeklyBudget(budget) {
 
 function validateRecipeSearchQuery(query) {
 
-    validateObject(query, "Recipe search query");
+    validateObject(
+        query,
+        "Recipe search query"
+    );
 
 
     const search = query.search === undefined
@@ -424,18 +502,19 @@ function validateRecipeSearchQuery(query) {
         );
 
 
-    const category = query.category === undefined ||
+    const category =
+        query.category === undefined ||
         query.category === "" ||
         query.category === "all"
-        ? ""
-        : validateString(
-            query.category,
-            "Recipe category",
-            {
-                maxLength: 40,
-                pattern: /^[a-zA-Z][a-zA-Z\s-]*$/
-            }
-        );
+            ? ""
+            : validateString(
+                query.category,
+                "Recipe category",
+                {
+                    maxLength: 40,
+                    pattern: /^[a-zA-Z][a-zA-Z\s-]*$/
+                }
+            );
 
 
     const sortOptions = [
@@ -494,17 +573,11 @@ function validateRecipeSearchQuery(query) {
 
 
     return {
-
-        search: search,
-
-        category: category,
-
-        sort: sort,
-
-        diet: diet,
-
-        maxTime: maxTime
-
+        search,
+        category,
+        sort,
+        diet,
+        maxTime
     };
 
 }
@@ -563,6 +636,8 @@ function validateHouseholdPreferences(input) {
     const errors = [];
 
 
+    // Collect validation errors so users can correct
+    // multiple fields in one attempt.
     function check(callback) {
 
         try {
@@ -587,7 +662,7 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // A. Shopping information
+    // A. SHOPPING INFORMATION
     // --------------------------------------------------------
 
     const retailer = check(function () {
@@ -617,7 +692,7 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // B. Household size
+    // B. HOUSEHOLD SIZE
     // --------------------------------------------------------
 
     const adultCount = check(function () {
@@ -651,21 +726,150 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // C. Children's age groups
+    // C. CHILDREN'S AGE GROUP COUNTS
     // --------------------------------------------------------
 
-    const childAgeGroups = check(function () {
+    // Expected data structure:
+    //
+    // childrenByAgeGroup: {
+    //     "0-2 years": 0,
+    //     "3-5 years": 1,
+    //     "6-12 years": 2,
+    //     "13-17 years": 0
+    // }
+    //
+    // Counts must add up to childCount.
 
-        return validateStringArray(
-            input.childAgeGroups || [],
-            "Children's age groups",
-            {
-                allowedValues: CHILD_AGE_GROUPS,
-                maxItems: 4
+    const rawChildrenByAgeGroup = input.childrenByAgeGroup;
+
+    const hasChildrenByAgeGroup =
+        isPlainObject(rawChildrenByAgeGroup);
+
+
+    const childrenByAgeGroup = {};
+
+
+    // Initialise every supported age group.
+    CHILD_AGE_GROUPS.forEach(function (ageGroup) {
+
+        childrenByAgeGroup[ageGroup] = 0;
+
+    });
+
+
+    if (
+        input.childrenByAgeGroup !== undefined &&
+        input.childrenByAgeGroup !== null &&
+        !hasChildrenByAgeGroup
+    ) {
+
+        errors.push(
+            "Children by age group must be provided as an object."
+        );
+
+    }
+
+
+    if (
+        childCount !== null &&
+        childCount > 0 &&
+        !hasChildrenByAgeGroup
+    ) {
+
+        errors.push(
+            "Please provide the number of children in each age group."
+        );
+
+    }
+
+
+    if (hasChildrenByAgeGroup) {
+
+        // Reject unknown age-group names.
+        Object.keys(rawChildrenByAgeGroup).forEach(
+            function (ageGroup) {
+
+                if (!CHILD_AGE_GROUPS.includes(ageGroup)) {
+
+                    errors.push(
+                        `Unsupported child age group: ${ageGroup}.`
+                    );
+
+                }
+
             }
         );
 
-    }) || [];
+
+        // Validate the number of children in each supported group.
+        CHILD_AGE_GROUPS.forEach(function (ageGroup) {
+
+            if (
+                !Object.prototype.hasOwnProperty.call(
+                    rawChildrenByAgeGroup,
+                    ageGroup
+                )
+            ) {
+                return;
+            }
+
+
+            const count = check(function () {
+
+                return validateNumber(
+                    rawChildrenByAgeGroup[ageGroup],
+                    `Children in ${ageGroup}`,
+                    {
+                        min: 0,
+                        max: 30,
+                        integer: true
+                    }
+                );
+
+            });
+
+
+            if (count !== null) {
+                childrenByAgeGroup[ageGroup] = count;
+            }
+
+        });
+
+    }
+
+
+    // Calculate the total number represented by age groups.
+    const groupedChildCount = Object.values(
+        childrenByAgeGroup
+    ).reduce(function (total, count) {
+
+        return total + count;
+
+    }, 0);
+
+
+    if (
+        childCount !== null &&
+        hasChildrenByAgeGroup &&
+        groupedChildCount !== childCount
+    ) {
+
+        errors.push(
+            "The number of children in the age groups must equal the total number of children."
+        );
+
+    }
+
+
+    // Derive selected age groups from actual child counts.
+    // This avoids maintaining two conflicting sources of truth.
+    const childAgeGroups = CHILD_AGE_GROUPS.filter(
+        function (ageGroup) {
+
+            return childrenByAgeGroup[ageGroup] > 0;
+
+        }
+    );
 
 
     if (
@@ -681,8 +885,164 @@ function validateHouseholdPreferences(input) {
     }
 
 
+    // Validate the legacy childAgeGroups property if supplied.
+    // It must agree with the age-group counts.
+    if (input.childAgeGroups !== undefined) {
+
+        const suppliedAgeGroups = check(function () {
+
+            return validateStringArray(
+                input.childAgeGroups,
+                "Children's age groups",
+                {
+                    allowedValues: CHILD_AGE_GROUPS,
+                    maxItems: 4
+                }
+            );
+
+        });
+
+
+        if (suppliedAgeGroups !== null) {
+
+            const sortedSupplied = [...suppliedAgeGroups].sort();
+
+            const sortedDerived = [...childAgeGroups].sort();
+
+            const matchesDerived =
+                JSON.stringify(sortedSupplied) ===
+                JSON.stringify(sortedDerived);
+
+
+            if (!matchesDerived) {
+
+                errors.push(
+                    "Selected child age groups must match the age-group child counts."
+                );
+
+            }
+
+        }
+
+    }
+
+
     // --------------------------------------------------------
-    // D. Weekly schedule
+    // D. CHILD PORTION FACTORS
+    // --------------------------------------------------------
+
+    // Expected data structure:
+    //
+    // childPortionFactors: {
+    //     "3-5 years": 0.5,
+    //     "6-12 years": 0.75
+    // }
+    //
+    // These are configurable household values.
+    // They are not medical or nutritional recommendations.
+
+    const rawChildPortionFactors = input.childPortionFactors;
+
+    const hasChildPortionFactors =
+        isPlainObject(rawChildPortionFactors);
+
+
+    const childPortionFactors = {};
+
+
+    if (
+        input.childPortionFactors !== undefined &&
+        input.childPortionFactors !== null &&
+        !hasChildPortionFactors
+    ) {
+
+        errors.push(
+            "Child portion factors must be provided as an object."
+        );
+
+    }
+
+
+    // Reject unsupported factor keys.
+    if (hasChildPortionFactors) {
+
+        Object.keys(rawChildPortionFactors).forEach(
+            function (ageGroup) {
+
+                if (!CHILD_AGE_GROUPS.includes(ageGroup)) {
+
+                    errors.push(
+                        `Unsupported child portion-factor age group: ${ageGroup}.`
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // A factor is required for every age group with children.
+    CHILD_AGE_GROUPS.forEach(function (ageGroup) {
+
+        if (childrenByAgeGroup[ageGroup] === 0) {
+            return;
+        }
+
+
+        if (
+            !hasChildPortionFactors ||
+            !Object.prototype.hasOwnProperty.call(
+                rawChildPortionFactors,
+                ageGroup
+            )
+        ) {
+
+            errors.push(
+                `Please provide a portion factor for children aged ${ageGroup}.`
+            );
+
+            return;
+
+        }
+
+
+        const factor = check(function () {
+
+            const value = validateNumber(
+                rawChildPortionFactors[ageGroup],
+                `Portion factor for ${ageGroup}`,
+                {
+                    min: 0,
+                    max: 10
+                }
+            );
+
+
+            if (value <= 0) {
+
+                throw new ValidationError(
+                    `Portion factor for ${ageGroup} must be greater than zero.`
+                );
+
+            }
+
+
+            return value;
+
+        });
+
+
+        if (factor !== null) {
+            childPortionFactors[ageGroup] = factor;
+        }
+
+    });
+
+
+    // --------------------------------------------------------
+    // E. WEEKLY SCHEDULE
     // --------------------------------------------------------
 
     const days = check(function () {
@@ -700,6 +1060,15 @@ function validateHouseholdPreferences(input) {
     }) || [];
 
 
+    if (days.length === 0) {
+
+        errors.push(
+            "Please select at least one day."
+        );
+
+    }
+
+
     const mealTypes = check(function () {
 
         return validateStringArray(
@@ -715,8 +1084,17 @@ function validateHouseholdPreferences(input) {
     }) || [];
 
 
+    if (mealTypes.length === 0) {
+
+        errors.push(
+            "Please select at least one meal type."
+        );
+
+    }
+
+
     // --------------------------------------------------------
-    // E. Kitchen appliances
+    // F. KITCHEN APPLIANCES
     // --------------------------------------------------------
 
     const appliances = check(function () {
@@ -734,7 +1112,7 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // F. Dietary preferences
+    // G. DIETARY PREFERENCES
     // --------------------------------------------------------
 
     const diet = check(function () {
@@ -749,7 +1127,7 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // G. Cooking preferences
+    // H. COOKING PREFERENCES
     // --------------------------------------------------------
 
     const cookingStyles = check(function () {
@@ -793,7 +1171,47 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // H. Calorie preferences
+    // I. ADULT PORTION FACTOR
+    // --------------------------------------------------------
+
+    // Defaults to one adult-equivalent serving per adult.
+    // A custom value may be supplied by the household.
+
+    let adultPortionFactor = 1;
+
+
+    if (input.adultPortionFactor !== undefined) {
+
+        adultPortionFactor = check(function () {
+
+            const value = validateNumber(
+                input.adultPortionFactor,
+                "Adult portion factor",
+                {
+                    min: 0,
+                    max: 10
+                }
+            );
+
+
+            if (value <= 0) {
+
+                throw new ValidationError(
+                    "Adult portion factor must be greater than zero."
+                );
+
+            }
+
+
+            return value;
+
+        });
+
+    }
+
+
+    // --------------------------------------------------------
+    // J. CALORIE PREFERENCES
     // --------------------------------------------------------
 
     const calorieGoalType = check(function () {
@@ -830,7 +1248,7 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // I. Allergies
+    // K. FOOD ALLERGIES
     // --------------------------------------------------------
 
     const allergies = check(function () {
@@ -848,7 +1266,7 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // J. Disliked ingredients
+    // L. DISLIKED INGREDIENTS
     // --------------------------------------------------------
 
     const dislikedIngredients = check(function () {
@@ -866,7 +1284,7 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // K. Weekly grocery budget
+    // M. WEEKLY GROCERY BUDGET
     // --------------------------------------------------------
 
     const weeklyBudget = check(function () {
@@ -890,7 +1308,7 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // L. Pantry inventory
+    // N. PANTRY INVENTORY
     // --------------------------------------------------------
 
     let pantryItems = [];
@@ -901,7 +1319,9 @@ function validateHouseholdPreferences(input) {
         !Array.isArray(input.pantryItems)
     ) {
 
-        errors.push("Pantry items must be provided as an array.");
+        errors.push(
+            "Pantry items must be provided as an array."
+        );
 
     } else if (Array.isArray(input.pantryItems)) {
 
@@ -940,7 +1360,7 @@ function validateHouseholdPreferences(input) {
 
 
     // --------------------------------------------------------
-    // M. Finish validation
+    // O. FINISH VALIDATION
     // --------------------------------------------------------
 
     if (errors.length > 0) {
@@ -953,47 +1373,53 @@ function validateHouseholdPreferences(input) {
     }
 
 
-    // Return a clean, consistent household object.
+    // Return a clean and consistent household object.
     return {
 
-        retailer: retailer,
+        retailer,
 
-        shoppingLocation: shoppingLocation,
+        shoppingLocation,
 
-        adultCount: adultCount,
+        adultCount,
 
-        childCount: childCount,
+        childCount,
 
         totalHouseholdMembers:
             adultCount + childCount,
 
-        childAgeGroups: childAgeGroups,
+        childAgeGroups,
 
-        days: days,
+        childrenByAgeGroup,
 
-        mealTypes: mealTypes,
+        childPortionFactors,
 
-        appliances: appliances,
+        adultPortionFactor,
 
-        diet: diet,
+        days,
 
-        cookingStyles: cookingStyles,
+        mealTypes,
 
-        maxCookingTime: maxCookingTime,
+        appliances,
 
-        calorieGoalType: calorieGoalType,
+        diet,
 
-        calorieTarget: calorieTarget,
+        cookingStyles,
 
-        allergies: allergies,
+        maxCookingTime,
 
-        dislikedIngredients: dislikedIngredients,
+        calorieGoalType,
 
-        weeklyBudget: weeklyBudget,
+        calorieTarget,
 
-        budgetScope: budgetScope,
+        allergies,
 
-        pantryItems: pantryItems
+        dislikedIngredients,
+
+        weeklyBudget,
+
+        budgetScope,
+
+        pantryItems
 
     };
 
@@ -1047,15 +1473,17 @@ function validatePantryItem(item, index = 0) {
             ? validateString(
                 item.id,
                 `${name} ID`,
-                { maxLength: 100 }
+                {
+                    maxLength: 100
+                }
             )
             : null,
 
-        name: name,
+        name,
 
-        quantity: quantity,
+        quantity,
 
-        unit: unit
+        unit
 
     };
 
@@ -1068,7 +1496,10 @@ function validatePantryItem(item, index = 0) {
 
 function validateShoppingItem(item) {
 
-    validateObject(item, "Shopping item");
+    validateObject(
+        item,
+        "Shopping item"
+    );
 
 
     const name = validateString(
@@ -1125,21 +1556,39 @@ function validateShoppingItem(item) {
     }
 
 
+    let purchased = false;
+
+
+    if (item.purchased !== undefined) {
+
+        if (typeof item.purchased !== "boolean") {
+
+            throw new ValidationError(
+                "Shopping item purchased status must be true or false."
+            );
+
+        }
+
+        purchased = item.purchased;
+
+    }
+
+
     return {
 
         id: item.id || null,
 
-        name: name,
+        name,
 
-        quantity: quantity,
+        quantity,
 
-        unit: unit,
+        unit,
 
-        category: category,
+        category,
 
-        unitCost: unitCost,
+        unitCost,
 
-        purchased: Boolean(item.purchased)
+        purchased
 
     };
 
@@ -1149,9 +1598,6 @@ function validateShoppingItem(item) {
 // ============================================================
 // 10. VALIDATE RECIPE SEARCH FILTERS
 // ============================================================
-
-// This function provides a convenient way to validate all
-// the recipe filters received from the frontend.
 
 function validateRecipeFilters(query) {
 
@@ -1166,7 +1612,10 @@ function validateRecipeFilters(query) {
 
 function validateMealPlanRequest(input) {
 
-    validateObject(input, "Meal plan request");
+    validateObject(
+        input,
+        "Meal plan request"
+    );
 
 
     const preferences = validateHouseholdPreferences(
@@ -1175,7 +1624,9 @@ function validateMealPlanRequest(input) {
 
 
     return {
-        preferences: preferences
+
+        preferences
+
     };
 
 }
@@ -1187,7 +1638,10 @@ function validateMealPlanRequest(input) {
 
 function validateGroceryPriceRequest(input) {
 
-    validateObject(input, "Grocery price request");
+    validateObject(
+        input,
+        "Grocery price request"
+    );
 
 
     if (!Array.isArray(input.items)) {
@@ -1211,30 +1665,36 @@ function validateGroceryPriceRequest(input) {
     }
 
 
-    const items = input.items.map(function (item, index) {
+    const items = input.items.map(
+        function (item, index) {
 
-        if (typeof item === "string") {
+            // Allow simple grocery item names.
+            if (typeof item === "string") {
 
-            return validateString(
+                return validateString(
+                    item,
+                    `Grocery item ${index + 1}`,
+                    {
+                        maxLength: 80
+                    }
+                );
+
+            }
+
+
+            // Also support structured shopping items.
+            const validatedItem = validateObject(
                 item,
-                `Grocery item ${index + 1}`,
-                {
-                    maxLength: 80
-                }
+                `Grocery item ${index + 1}`
+            );
+
+
+            return validateShoppingItem(
+                validatedItem
             );
 
         }
-
-
-        const validatedItem = validateObject(
-            item,
-            `Grocery item ${index + 1}`
-        );
-
-
-        return validateShoppingItem(validatedItem);
-
-    });
+    );
 
 
     let retailer = "";
@@ -1258,9 +1718,9 @@ function validateGroceryPriceRequest(input) {
 
     return {
 
-        items: items,
+        items,
 
-        retailer: retailer
+        retailer
 
     };
 
@@ -1273,7 +1733,10 @@ function validateGroceryPriceRequest(input) {
 
 function validateNutritionRequest(input) {
 
-    validateObject(input, "Nutrition request");
+    validateObject(
+        input,
+        "Nutrition request"
+    );
 
 
     const ingredients = validateStringArray(
@@ -1298,7 +1761,7 @@ function validateNutritionRequest(input) {
 
     return {
 
-        ingredients: ingredients
+        ingredients
 
     };
 
@@ -1306,7 +1769,7 @@ function validateNutritionRequest(input) {
 
 
 // ============================================================
-// 14. EXPORT VALIDATION FUNCTIONS
+// 14. EXPORT PUBLIC FUNCTIONS AND CONSTANTS
 // ============================================================
 
 export {
