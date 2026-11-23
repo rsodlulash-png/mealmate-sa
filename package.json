@@ -1,0 +1,17 @@
+{
+    "name": "mealmate-sa",
+    "version": "1.0.0",
+    "description": "A personalised South African household meal planning application.",
+    "private": true,
+    "type": "module",
+    "main": "src/server.js",
+    "scripts": {
+        "start": "node src/server.js",
+        "dev": "node --watch src/server.js",
+        "test": "node --test"
+    },
+    "dependencies": {
+        "dotenv": "^18.0.10",
+        "express": "^5.3.0"
+    }
+}
