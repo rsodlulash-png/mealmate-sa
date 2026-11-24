@@ -89,12 +89,11 @@ bash
 curl -i http://localhost:3000/api/health
 External API
 
-The backend uses TheMealDB V1 API (https://www.themealdb.com/api/json/v1/<API_KEY>/):
+The backend uses TheMealDB V1 API Documentation (https://www.themealdb.com/documentation)
 
 TheMealDB endpoint	Used for
 search.php?s=	Search by name
 filter.php?i=	Search by ingredient
-filter.php?c=	Filter by category
 lookup.php?i=	Recipe details
 random.php	Random recipe
 
