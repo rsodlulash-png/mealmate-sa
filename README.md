@@ -4,6 +4,7 @@ A meal-planning web app for South African households. Users can search recipes, 
 
 Live app: http://18.130.138.158
 GitHub: https://github.com/rsodlulash-png/mealmate-sa
+Video Demo: https://drive.google.com/file/d/1Td9OLCcU0JVzaBkT-2QxtkHh-axH5RDb/view?usp=sharing
 
 The live link runs on the lab's load-balancer server, so it may stop working if the lab servers are stopped or reset.
 
